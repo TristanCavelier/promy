@@ -6,11 +6,36 @@
 // the COPYING file for more details.
 
 /*jslint indent: 2, maxlen: 80, nomen: true */
+/*global Promise, console */
 
 (function (root) {
   "use strict";
 
-  var Promise = root.promy.Promise;
+  var Promise, resolve;
+
+  if (root.promy) {
+    Promise = root.promy.Promise;
+  } else {
+    Promise = root.Promise;
+  }
+
+  if (typeof Promise.prototype.cancel !== "function") {
+    // cancel seems to be non existent on this kind of promise
+    // cancellation is the main purpose of this library
+    console.warn("All features of the CancellableChain may not be enabled!");
+  }
+
+  if (typeof Promise !== "function") {
+    // Promise is not a constructor
+    Promise(); // throw error here
+  }
+
+  resolve = Promise.resolve;
+
+  if (typeof resolve !== "function") {
+    // Promise.resolve is not a function
+    resolve(); // throw error here
+  }
 
   /**
    * Acts like promise chain with the then function. In addition, all the
@@ -28,10 +53,10 @@
    * @param  {Any}
    */
   function CancellableChain(value) {
-    this._promises = [Promise.resolve(value).then()];
     if (!(this instanceof CancellableChain)) {
       return new CancellableChain(value);
     }
+    this._promises = [resolve(value).then()];
   }
 
   /**
@@ -83,7 +108,9 @@
   CancellableChain.prototype.cancel = function () {
     var i, promises = this._promises, l = promises.length;
     for (i = 0; i < l; i += 1) {
-      promises[i].cancel();
+      if (typeof promises[i].cancel === "function") {
+        promises[i].cancel();
+      }
     }
     return this;
   };
@@ -103,6 +130,14 @@
     }, this.cancel.bind(this));
   };
 
-  root.promy.CancellableChain = CancellableChain;
+  // export
+  if (root.promy) {
+    root.promy.CancellableChain = CancellableChain;
+    if (root.CancellableChain === undefined) {
+      root.CancellableChain = CancellableChain;
+    }
+  } else {
+    root.CancellableChain = CancellableChain;
+  }
 
 }(this));
