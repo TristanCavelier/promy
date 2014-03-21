@@ -59,6 +59,9 @@
   });
 
   promy.CancelException = CancelException;
+  if (root.CancelException === undefined) {
+    root.CancelException = CancelException;
+  }
 
   //////////////////////////////////////////////////////////////////////
 
@@ -487,6 +490,9 @@
   };
 
   promy.Promise = Promise;
+  if (root.Promise === undefined) {
+    root.Promise = Promise;
+  }
 
   /**
    * cast(value): Promise< value >
@@ -706,6 +712,15 @@
   promy.rejected = Promise.reject;
   promy.fulfilled = Promise.fulfill;
   promy.pending = pending;
+  if (root.rejected === undefined) {
+    root.rejected = Promise.reject;
+  }
+  if (root.fulfilled === undefined) {
+    root.fulfilled = Promise.fulfill;
+  }
+  if (root.pending === undefined) {
+    root.pending = pending;
+  }
 
   root.promy = promy;
 
