@@ -3,6 +3,8 @@ promy
 
 A Promise A+ compatible library with cancellation and notification
 
+Version: v1.0.0
+
 License
 =======
 

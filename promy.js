@@ -5,6 +5,10 @@
 // To Public License, Version 2, as published by Sam Hocevar. See
 // the COPYING file for more details.
 
+// Promy
+// A Promise A+ compatible library with cancellation and notification
+// v1.0.0
+
 /*jslint indent: 2, maxlen: 80, nomen: true, node: true */
 /*global setTimeout, setImmediate */
 
