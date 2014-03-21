@@ -29,6 +29,9 @@
    */
   function CancellableChain(value) {
     this._promises = [Promise.resolve(value).then()];
+    if (!(this instanceof CancellableChain)) {
+      return new CancellableChain(value);
+    }
   }
 
   /**
