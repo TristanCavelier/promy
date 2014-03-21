@@ -479,7 +479,7 @@
           }
         });
       }
-      reject(this, new CancelException());
+      reject(this, new CancelException("Cancelled"));
       // call .cancel() to the inside then callback returned promise
       emit.call(this, "promise:cancelled", {}); // "detail": undefined
     }
