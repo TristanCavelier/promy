@@ -560,9 +560,6 @@
    */
   Promise.all = function (promises) {
     var length = promises.length;
-    promises = promises.map(function (value) {
-      return promise_cast(value);
-    });
 
     function cancel() {
       var i;
@@ -571,6 +568,10 @@
           promises[i].cancel();
         }
       }
+    }
+
+    if (length === 0) {
+      return new Promise(function (done) { done([]); });
     }
 
     return new Promise(function (resolve, reject, notify) {
@@ -590,17 +591,8 @@
         cancel();
       }
 
-      function notifier(i) {
-        return function (value) {
-          notify({
-            "function": "all",
-            "index": i,
-            "value": value
-          });
-        };
-      }
       for (i = 0; i < length; i += 1) {
-        promises[i].then(resolver(i), rejecter, notifier(i));
+        promises[i].then(resolver(i), rejecter, notify);
       }
     }, cancel);
   };
@@ -617,10 +609,9 @@
    */
   Promise.race = function (promises) {
     var length = promises.length;
-    promises = promises.slice(); // copy promises
 
     if (length === 0) {
-      return Promise.resolve();
+      return new Promise(function (done) { done(); });
     }
 
     function cancel() {
@@ -650,17 +641,8 @@
         }
       }
 
-      function notifier(i) {
-        return function (value) {
-          notify({
-            "function": "race",
-            "index": i,
-            "value": value
-          });
-        };
-      }
       for (i = 0; i < length; i += 1) {
-        promises[i].then(resolver, rejecter, notifier(i));
+        promises[i].then(resolver, rejecter, notify);
       }
     }, cancel);
   };
