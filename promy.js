@@ -147,18 +147,18 @@
    * @return {Boolean} The test result
    */
   function objectOrFunction(v) {
-    return typeof v === "function" || (typeof v === "object" && v !== null);
+    return (typeof v === "object" && v !== null) || typeof v === "function";
   }
 
   /**
-   * fulfill(promise, value): undefined
+   * fulfill.call(promise, value): undefined
    *
    * Fulfills the promise with the given value if not settled.
    *
-   * @param  {Promise} promise The promise to fulfill
    * @param  {Any} value The fulfillment value
    */
-  function fulfill(promise, value) {
+  function fulfill(value) {
+    var promise = this;
     async(function () {
       if (!promise.settled) {
         promise.isFulfilled = true;
@@ -170,14 +170,14 @@
   }
 
   /**
-   * reject(promise, value): undefined
+   * reject.call(promise, value): undefined
    *
    * Rejects the promise with the given value if not settled.
    *
-   * @param  {Promise} promise The promise to reject
    * @param  {Any} value The rejection value
    */
-  function reject(promise, value) {
+  function reject(value) {
+    var promise = this;
     async(function () {
       if (!promise.settled) {
         promise.isRejected = true;
@@ -189,14 +189,14 @@
   }
 
   /**
-   * notify(promise, value): undefined
+   * notify.call(promise, value): undefined
    *
    * Sends a notification to the promise with the given value if not settled.
    *
-   * @param  {Promise} promise The promise to reject
    * @param  {Any} value The rejected value
    */
-  function notify(promise, value) {
+  function notify(value) {
+    var promise = this;
     async(function () {
       if (!promise.settled) {
         emit.call(promise, "promise:notified", {"detail": value});
@@ -205,7 +205,7 @@
   }
 
   /**
-   * resolve(promise, value): undefined
+   * resolve.call(promise, value): undefined
    *
    * Fulfill the promise with the given value. If the value is a thenable object
    * or function, the promise will be fulfilled by the thenable fulfillment
@@ -213,31 +213,29 @@
    * the value is equal to the promise, then the promise will be fulfilled with
    * itself as fulfillment value.
    *
-   * @param  {Promise} promise The promise to resolve
    * @param  {Any} value The value set for fulfillment or rejection.
    */
-  function resolve(promise, value) {
+  function resolve(value) {
     /*global handleThenable*/
     // the handleThenable cannot operate with promise === value, so in this
     // case, the promise is fulfilled with itself as fulfillment value.
-    if (promise === value || !handleThenable(promise, value)) {
-      fulfill(promise, value);
+    if (this === value || !handleThenable.call(this, value)) {
+      fulfill.call(this, value);
     }
   }
 
   /**
-   * handleThenable(promise, value): Boolean
+   * handleThenable.call(promise, value): Boolean
    *
    * Handles  the value  as  a possible  thenable object  or  function. If  this
    * function manage  to handle the thenable,  it will resolve the  promise with
    * the thenable value and return true. Otherwise, it returns false.
    *
-   * @param  {Promise} promise The promise to resolve
    * @param  {Any} value The value set for fulfillment or rejection
    * @return {Boolean} true if succeed to resolve
    */
-  function handleThenable(promise, value) {
-    var then = null, resolved;
+  function handleThenable(value) {
+    var then = null, resolved, promise = this;
     // the resolved variable prevents the then functions to call resolve or
     // reject more than one time.
     try {
@@ -259,27 +257,27 @@
             }
             resolved = true;
             if (value !== val) {
-              resolve(promise, val);
+              resolve.call(promise, val);
             } else {
               // if the returned value is the current thenable, do a `resolve`
               // will do an infernal loop. So the promise must be fulfilled
               // directly.
-              fulfill(promise, val);
+              fulfill.call(promise, val);
             }
           }, function (val) {
             if (resolved) {
               return true;
             }
             resolved = true;
-            reject(promise, val);
+            reject.call(promise, val);
           }, function (notification) {
-            notify(promise, notification);
+            notify.call(promise, notification);
           });
           return true;
         }
       }
     } catch (error) {
-      reject(promise, error);
+      reject.call(promise, error);
       return true;
     }
     return false;
@@ -306,17 +304,17 @@
       value = event.detail;
       succeeded = true;
     }
-    if (handleThenable(promise, value)) {
+    if (handleThenable.call(promise, value)) {
       return;
     }
     if (hasCallback && succeeded) {
-      resolve(promise, value);
+      resolve.call(promise, value);
     } else if (failed) {
-      reject(promise, error);
+      reject.call(promise, error);
     } else if (type === "onResolve") {
-      resolve(promise, value);
+      resolve.call(promise, value);
     } else if (type === "onReject") {
-      reject(promise, value);
+      reject.call(promise, value);
     }
   }
 
@@ -330,9 +328,9 @@
         // stop propagation
         return;
       }
-      notify(promise, value);
+      notify.call(promise, value);
     } else {
-      notify(promise, event.detail);
+      notify.call(promise, event.detail);
     }
   }
 
@@ -345,8 +343,7 @@
    * @constructor
    */
   function Promise(executor, canceller) {
-    var promise = this;
-    if (!(promise instanceof Promise)) {
+    if (!(this instanceof Promise)) {
       return new Promise(executor, canceller);
     }
     if (typeof executor !== "function") {
@@ -356,19 +353,10 @@
     if (typeof canceller === "function") {
       on.call(this, "promise:cancelled", canceller);
     }
-    function resolvePromise(value) {
-      resolve(promise, value);
-    }
-    function rejectPromise(value) {
-      reject(promise, value);
-    }
-    function notifyPromise(value) {
-      notify(promise, value);
-    }
     try {
-      executor(resolvePromise, rejectPromise, notifyPromise);
+      executor(resolve.bind(this), reject.bind(this), notify.bind(this));
     } catch (e) {
-      rejectPromise(e);
+      reject.call(this, e);
     }
   }
 
@@ -380,18 +368,11 @@
 
   // // Used for debugging
   // Promise.prototype.on = on;
-  // Promise.prototype.once = once;
   // Promise.prototype.emit = emit;
-  // Promise.prototype.removeListener = removeListener;
-  // Promise.prototype.resolve = function (value) {
-  //   resolve(this, value);
-  // };
-  // Promise.prototype.reject = function (value) {
-  //   reject(this, value);
-  // };
-  // Promise.prototype.notify = function (value) {
-  //   notify(this, value);
-  // };
+  // Promise.prototype.resolve = resolve;
+  // Promise.prototype.fulfill = fulfill;
+  // Promise.prototype.reject = reject;
+  // Promise.prototype.notify = notify;
 
   /**
    * then(done, fail, progress): Promise
@@ -482,7 +463,7 @@
           }
         });
       }
-      reject(this, new CancelException("Cancelled"));
+      reject.call(this, new CancelException("Cancelled"));
       // call .cancel() to the inside then callback returned promise
       emit.call(this, "promise:cancelled", {}); // "detail": undefined
     }
