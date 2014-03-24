@@ -97,6 +97,19 @@
   };
 
   /**
+   * progress(progress): CancellableChain
+   *
+   * A shortcut for `then(null, null, progress)`.
+   *
+   * @method progress
+   * @param  {Function} progress The callback to call on notify
+   * @return {CancellableChain} Itself
+   */
+  CancellableChain.prototype.progress = function (progress) {
+    return this.then(null, null, progress);
+  };
+
+  /**
    * cancel(): CancellableChain
    *
    * Cancels each link of the chain operation by rejecting them with
