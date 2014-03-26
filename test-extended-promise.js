@@ -64,6 +64,45 @@
     });
   });
 
+  test("should notify during operation", function () {
+    stop();
+    var results = [];
+
+    Promise.notify(true).
+      then(Promise.notify.bind(null, 10), null, function (value) {
+        results.push(value);
+        return "string";
+      }).
+      then(function () {
+        deepEqual(results, [true, "string", 10]);
+        start();
+      }, null, function (value) {
+        results.push(value);
+      }).
+      catch(function () {
+        ok(false, "Error should not occur!");
+        start();
+      });
+  });
+
+  test("should notify and propagate fulfillment value", function () {
+    stop();
+    var results = [];
+
+    Promise.resolve(true).
+      then(Promise.notify.bind(null, 10)).
+      then(function (answer) {
+        results.push(answer);
+        deepEqual(results, [10, true]);
+        start();
+      }, null, function (value) {
+        results.push(value);
+      }).
+      catch(function () {
+        ok(false, "Error should not occur!");
+        start();
+      });
+  });
 
   module("Promise Cancellations");
 

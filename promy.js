@@ -545,6 +545,24 @@
   };
 
   /**
+   * notify(notification[, answer]): Promise< answer >
+   *
+   * Creates a new promise which notifies with the given value and resolve with
+   * `answer`.
+   *
+   * @param  {Any} notification The value to send
+   * @param  {Any} [answer=undefined] The value to use on resolve
+   * @return {Promise} A new fulfilled promise
+   */
+  Promise.notify = function (notification, answer) {
+    return new Promise(function (resolve, reject, notify) {
+      /*jslint unparam: true */
+      notify(notification);
+      resolve(answer);
+    });
+  };
+
+  /**
    * all(promises): Promise< promises_fulfilment_values >
    * all(promises): Promise< one_rejected_reason >
    *
