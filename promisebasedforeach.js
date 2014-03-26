@@ -38,7 +38,7 @@
   }
 
   /**
-   * forEach(array, callback[, thisArg]): Promise
+   *     forEach(array, callback[, thisArg]): Promise
    *
    * It executes the provided `callback` once for each element of the array with
    * an assigned value asynchronously. If the `callback` returns a promise, then
@@ -61,10 +61,14 @@
    *
    * Inspired by `Array.prototype.forEach` from Mozilla Developer Network.
    *
+   *     forEach(["a", "b", "c"], function (value, index, array) {
+   *       return ajaxPostValueSomewhere(value);
+   *     }).then(onDone, onError, onNotify);
+   *
    * @param  {Array} array The array to parse
    * @param  {Function} callback Function to execute for each element.
    * @param  {Any} [thisArg] Value to use as `this` when executing `callback`.
-   * @param  {Promise} A new promise.
+   * @param  {Promise} A new promise with no fulfillment value.
    */
   function forEach(array, fn, thisArg) {
     if (arguments.length === 0) {
