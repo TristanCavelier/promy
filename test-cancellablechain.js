@@ -6,7 +6,8 @@
 // the COPYING file for more details.
 
 /*jslint indent: 2, maxlen: 80 */
-/*global module, test, ok, stop, start, promy, setTimeout */
+/*global module, test, ok, stop, start, CancellableChain, CancelException,
+  Promise, setTimeout */
 
 (function () {
   "use strict";
@@ -21,11 +22,11 @@
     };
   }
 
-  module("promy.CancellableChain");
+  module("CancellableChain");
 
   test("then returns the CancellableChain", function () {
     var a, b;
-    a = new promy.CancellableChain();
+    a = new CancellableChain();
     b = a.then(function () {
       return;
     });
@@ -37,7 +38,7 @@
     stop();
     var start = starter();
 
-    new promy.CancellableChain(true).then(function (answer) {
+    new CancellableChain(true).then(function (answer) {
       ok(answer === true);
       start();
     });
@@ -48,10 +49,10 @@
   test("cancel should cancel all remaining promises", 2, function () {
     stop();
     var start = starter();
-    new promy.CancellableChain().then(null, function (error) {
-      ok(error instanceof promy.CancelException, 'then 1');
+    new CancellableChain().then(null, function (error) {
+      ok(error instanceof CancelException, 'then 1');
     }).then(null, function (error) {
-      ok(error instanceof promy.CancelException, 'then 2');
+      ok(error instanceof CancelException, 'then 2');
       start();
     }).cancel();
 
@@ -59,7 +60,7 @@
   });
 
   test("can be converted to normal promise", function () {
-    ok(new promy.CancellableChain().detach() instanceof promy.Promise);
+    ok(new CancellableChain().detach() instanceof Promise);
   });
 
   test("cancel normal promise should cancel the chain", function () {
@@ -67,9 +68,9 @@
     var start = starter();
 
     function doSomething() {
-      return new promy.CancellableChain().
+      return new CancellableChain().
         then(null, function (error) {
-          ok(error instanceof promy.CancelException, 'then 1');
+          ok(error instanceof CancelException, 'then 1');
           start();
         }).detach();
     }
