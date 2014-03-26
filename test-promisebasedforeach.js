@@ -59,17 +59,7 @@
     stop();
     var start = starter(), results = [], array = [0, 2, 4, 6];
 
-    function notifyAndResolve(value) {
-      return new Promise(function (done, fail, notify) {
-        /*jslint unparam: true */
-        notify(value);
-        done();
-      });
-    }
-
-    forEach(array, function (value) {
-      return notifyAndResolve(value);
-    }).then(function () {
+    forEach(array, Promise.notify).then(function () {
       deepEqual(results, [0, 2, 4, 6]);
       start();
     }, null, function (event) {
