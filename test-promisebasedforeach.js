@@ -26,14 +26,15 @@
 
   test("check when callbacks are called without promises", 1, function () {
     stop();
-    var start = starter(), results = [], array = [0, 2, 4, 6];
+    var start = starter(), results = [], array = [0, 2, 4];
 
     forEach(array, function (value, index, array) {
       results.push(value, index, array);
     }).then(function () {
-      deepEqual(results, [0, 0, array, 2, 1, array, 4, 2, array, 6, 3, array]);
+      deepEqual(results, ["first", 0, 0, array, 2, 1, array, 4, 2, array]);
       start();
     });
+    results.push("first");
 
     setTimeout(start, 200);
   });
