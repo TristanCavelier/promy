@@ -88,12 +88,6 @@
           return;
         }
         if (i < array.length) {
-          notify({
-            "function": "forEach",
-            "loaded": i,
-            "total": array.length,
-            "target": array
-          });
           current_promise =
             current_promise.then(fn.bind(thisArg, array[i], i, array));
           current_promise.then(next, fail, notify);

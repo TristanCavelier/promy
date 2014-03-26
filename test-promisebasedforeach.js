@@ -55,22 +55,6 @@
     setTimeout(start, 200);
   });
 
-  test("should notify the iteration progress", 1, function () {
-    stop();
-    var start = starter(), results = [];
-
-    forEach([0, 2, 4, 6], function () {
-      return;
-    }).then(function () {
-      deepEqual(results, [0, 1, 2, 3]);
-      start();
-    }, null, function (event) {
-      results.push(event.loaded);
-    });
-
-    setTimeout(start, 200);
-  });
-
   test("should notify the sub promises notifications", 1, function () {
     stop();
     var start = starter(), results = [], array = [0, 2, 4, 6];
@@ -86,7 +70,7 @@
     forEach(array, function (value) {
       return notifyAndResolve(value);
     }).then(function () {
-      deepEqual(results, [0, 0, 1, 2, 2, 4, 3, 6]);
+      deepEqual(results, [0, 2, 4, 6]);
       start();
     }, null, function (event) {
       if (event.target === array) {
