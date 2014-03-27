@@ -64,6 +64,59 @@ Inspired by [`Array.prototype.forEach`][1] from Mozilla Developer Network.
     }).then(onDone, onError, onNotify);
 
 
+Range
+-----
+
+A cancellable and notification propagation Promise A+ tool to iterate a range.
+
+File: `range.js`
+
+Version: v1.0.0
+
+If the global `promy` exists, then `promy.range` is added and if the global
+`range` does not exist, it is also provided. Else, if the global `promy` does
+not exist, then only the global `range` will be provided.
+
+It uses by default `promy.Promise` as promise mechanism. If `promy` is not
+provided, then the global `Promise` will be used instead.
+
+API:
+
+    range(stop, callback): Promise
+    range(start, stop[, step], callback): Promise
+
+Param:
+
+- `{Number} [start=0]` The start index
+- `{Number} stop` The stop index
+- `{Number} [step=1]` One step
+- `{Function} callback` Function to execute on each iteration.
+
+Returns:
+
+- `{Promise}` A new promise with no fulfillment value.
+
+It executes the provided `callback` once for each step between `start` and
+`stop`. If the `callback` returns a promise, then the function will wait
+for its fulfillment before executing the next iteration.
+
+`callback` is invoked with one argument:
+
+- the index of the step
+
+`start`, `stop` and `step` must be finite numbers. If `step` is not
+provided, then the default step will be `1`. If `start` and `step` are not
+provided, `start` will be `0` and `step` will be `1`.
+
+Inspired by [`range()`][1] from Python 3 built-in functions.
+
+[1]: http://docs.python.org/3.4/library/functions.html#func-range
+
+    range(10, function (index) {
+      return notifyIndex(index);
+    }).then(onDone, onError, onNotify);
+
+
 License
 =======
 
