@@ -72,16 +72,16 @@
    */
   function forEach(array, fn, thisArg) {
     if (arguments.length === 0) {
-      throw new TypeError("missing argument 0 when calling function forEach");
+      throw new TypeError("forEach(): missing argument 1");
     }
     if (!isArray(array)) {
-      throw new TypeError(array + " is not an array");
+      throw new TypeError("forEach(): argument 1 is not an array");
     }
     if (arguments.length === 1) {
-      throw new TypeError("missing argument 1 when calling function forEach");
+      throw new TypeError("forEach(): missing argument 2");
     }
     if (typeof fn !== "function") {
-      throw new TypeError(fn + " is not a function");
+      throw new TypeError("forEach(): argument 2 is not a function");
     }
     var cancelled, current_promise = resolve();
     return new Promise(function (done, fail, notify) {
