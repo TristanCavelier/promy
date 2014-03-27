@@ -1,9 +1,18 @@
-// Copyright (c) 2014 Tristan Cavelier <t.cavelier@free.fr>
-// This program is free software. It comes without any warranty, to
-// the extent permitted by applicable law. You can redistribute it
-// and/or modify it under the terms of the Do What The Fuck You Want
-// To Public License, Version 2, as published by Sam Hocevar. See
-// the COPYING file for more details.
+/*
+ * Promise based forEach
+ *
+ * A cancellable and notification propagation Promise A+ tool to iterate an
+ * array.
+ *
+ * Version: v1.0.0
+ *
+ * Copyright (c) 2014 Tristan Cavelier <t.cavelier@free.fr>
+ * This program is free software. It comes without any warranty, to
+ * the extent permitted by applicable law. You can redistribute it
+ * and/or modify it under the terms of the Do What The Fuck You Want
+ * To Public License, Version 2, as published by Sam Hocevar. See
+ * the COPYING file for more details.
+ */
 
 /*jslint indent: 2, maxlen: 80, nomen: true */
 /*global Promise, console */
@@ -101,7 +110,11 @@
     });
   }
 
-  // export
+  /*
+   * If the global `promy` exists, then `promy.forEach` is added and if the
+   * global `forEach` does not exist, it is also provided. Else, if the global
+   * `promy` does not exist, then only the global `forEach` will be provided.
+   */
   if (root.promy) {
     root.promy.forEach = forEach;
     if (root.forEach === undefined) {
