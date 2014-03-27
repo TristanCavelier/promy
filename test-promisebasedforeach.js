@@ -116,10 +116,14 @@
     stop();
     var start = starter(), p, results = [true];
 
+    function never() {
+      return new Promise(function () { return; });
+    }
+
     p = forEach([0, 2, 4, 6], function () {
       ok(results.shift());
       setTimeout(p.cancel.bind(p));
-      return Promise.resolve();
+      return never();
     });
 
     p.then(function () {
