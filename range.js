@@ -41,8 +41,8 @@
     for (i = 0, l = array.length; i < l; i += 1) {
       v = array[i];
       type = typeof v;
-      types[type] = types[type] || [];
-      types[type].push(v);
+      /*jslint ass: true */
+      (types[type] = types[type] || []).push(v);
     }
     return types;
   }
