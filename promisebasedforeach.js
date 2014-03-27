@@ -11,30 +11,22 @@
 (function (root) {
   "use strict";
 
-  var Promise, resolve, isArray;
+  var isArray = Array.isArray;
 
-  if (root.promy) {
-    Promise = root.promy.Promise;
-  } else {
-    Promise = root.Promise;
+  /*
+   * It uses by default `promy.Promise` as promise mechanism. If `promy` is not
+   * provided, then the global `Promise` will be used instead.
+   */
+  function newPromise(executor, canceller) {
+    var Cons = ((root.promy && root.promy.Promise) || root.Promise);
+    return new Cons(
+      executor,
+      canceller
+    );
   }
 
-  if (typeof Promise !== "function") {
-    // Promise is not a constructor
-    Promise(); // throw error here
-  }
-
-  resolve = Promise.resolve;
-
-  if (typeof resolve !== "function") {
-    // Promise.resolve is not a function
-    resolve(); // throw error here
-  }
-
-  isArray = Array.isArray;
-
-  if (typeof isArray !== "function") {
-    isArray(); // throw error here
+  function resolve() {
+    return newPromise(function (done) { done(); });
   }
 
   /**
@@ -84,7 +76,7 @@
       throw new TypeError("forEach(): argument 2 is not a function");
     }
     var cancelled, current_promise = resolve();
-    return new Promise(function (done, fail, notify) {
+    return newPromise(function (done, fail, notify) {
       var i = 0;
       function next() {
         if (cancelled) {
