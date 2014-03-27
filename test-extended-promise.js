@@ -127,4 +127,22 @@
     setTimeout(start, 100);
   });
 
+  test("should cancels itself", 1, function () {
+    stop();
+    var start = starter(), p = new Promise(function (resolve) {
+      resolve();
+    }).then(function () {
+      p.cancel();
+      return true;
+    }, function () {
+      ok(false, "Should neven happen!");
+    });
+    p.then(null, function (error) {
+      ok(error instanceof CancelException, 'then 2');
+      start();
+    });
+
+    setTimeout(start, 100);
+  });
+
 }());
