@@ -70,7 +70,7 @@
    * @param  {Any} [thisArg] Value to use as `this` when executing `callback`.
    * @param  {Promise} A new promise with no fulfillment value.
    */
-  function forEach(array, fn, thisArg) {
+  function forEach(array, callback, thisArg) {
     if (arguments.length === 0) {
       throw new TypeError("forEach(): missing argument 1");
     }
@@ -80,7 +80,7 @@
     if (arguments.length === 1) {
       throw new TypeError("forEach(): missing argument 2");
     }
-    if (typeof fn !== "function") {
+    if (typeof callback !== "function") {
       throw new TypeError("forEach(): argument 2 is not a function");
     }
     var cancelled, current_promise = resolve();
@@ -93,7 +93,7 @@
         }
         if (i < array.length) {
           current_promise =
-            current_promise.then(fn.bind(thisArg, array[i], i, array));
+            current_promise.then(callback.bind(thisArg, array[i], i, array));
           current_promise.then(next, fail, notify);
           i += 1;
           return;
