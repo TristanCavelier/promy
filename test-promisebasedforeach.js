@@ -64,11 +64,7 @@
       deepEqual(results, [0, 2, 4, 6]);
       start();
     }, null, function (event) {
-      if (event.target === array) {
-        results.push(event.loaded);
-      } else {
-        results.push(event);
-      }
+      results.push(event);
     });
 
     setTimeout(start, 200);
