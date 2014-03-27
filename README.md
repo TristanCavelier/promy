@@ -9,6 +9,21 @@ Version: v1.0.0
 Promise based forEach
 ---------------------
 
+A cancellable and notification propagation Promise A+ tool to iterate an array.
+
+File: `promisebasedforeach.js`
+
+Version: v1.0.1
+
+If the global `promy` exists, then `promy.forEach` is added and if the global
+`forEach` does not exist, it is also provided. Else, if the global `promy` does
+not exist, then only the global `forEach` will be provided.
+
+It uses by default `promy.Promise` as promise mechanism. If `promy` is not
+provided, then the global `Promise` will be used instead.
+
+*API:*
+
     forEach(array, callback[, thisArg]): Promise
 
 Param:
