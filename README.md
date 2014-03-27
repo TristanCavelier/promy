@@ -22,7 +22,7 @@ not exist, then only the global `forEach` will be provided.
 It uses by default `promy.Promise` as promise mechanism. If `promy` is not
 provided, then the global `Promise` will be used instead.
 
-*API:*
+API:
 
     forEach(array, callback[, thisArg]): Promise
 
@@ -55,9 +55,9 @@ Unlike `Array.prototype.forEach`, you can stop the iteration by throwing
 something, or by doing a `cancel` to the returned promise if it is
 cancellable promise.
 
-Inspired by [`Array.prototype.forEach`][1] from Mozilla Developer Network.
+Inspired by [`Array.prototype.forEach`][forEach()] from Mozilla Developer Network.
 
-[1]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
+[forEach()]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach
 
     forEach(["a", "b", "c"], function (value, index, array) {
       return ajaxPostValueSomewhere(value);
@@ -108,9 +108,9 @@ for its fulfillment before executing the next iteration.
 provided, then the default step will be `1`. If `start` and `step` are not
 provided, `start` will be `0` and `step` will be `1`.
 
-Inspired by [`range()`][1] from Python 3 built-in functions.
+Inspired by [`range()`][range()] from Python 3 built-in functions.
 
-[1]: http://docs.python.org/3.4/library/functions.html#func-range
+[range()]: http://docs.python.org/3.4/library/functions.html#func-range
 
     range(10, function (index) {
       return notifyIndex(index);
