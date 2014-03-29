@@ -1,9 +1,19 @@
-// Copyright (c) 2014 Tristan Cavelier <t.cavelier@free.fr>
-// This program is free software. It comes without any warranty, to
-// the extent permitted by applicable law. You can redistribute it
-// and/or modify it under the terms of the Do What The Fuck You Want
-// To Public License, Version 2, as published by Sam Hocevar. See
-// the COPYING file for more details.
+/*
+ * CancellableChain
+ *
+ * A cancellable and notification propagation Promise A+ tool to cancel a
+ * complete sequence of `then` promises since the creation of the cancellable
+ * chain.
+ *
+ * Version: v1.0.0
+ *
+ * Copyright (c) 2014 Tristan Cavelier <t.cavelier@free.fr>
+ * This program is free software. It comes without any warranty, to
+ * the extent permitted by applicable law. You can redistribute it
+ * and/or modify it under the terms of the Do What The Fuck You Want
+ * To Public License, Version 2, as published by Sam Hocevar. See
+ * the COPYING file for more details.
+ */
 
 /*jslint indent: 2, maxlen: 80, nomen: true */
 /*global Promise, console */
@@ -38,6 +48,8 @@
   }
 
   /**
+   *     new CancellableChain(value)
+   *
    * Acts like promise chain with the then function. In addition, all the
    * sequence can be cancelled by calling the `cancel` method.
    *
@@ -60,7 +72,7 @@
   }
 
   /**
-   * then(done, fail, progress): CancellableChain
+   *     then(done, fail, progress): CancellableChain
    *
    * Acts like `promise.then` method, and also keep the chain operation in order
    * to cancel each link one by one.
@@ -84,7 +96,7 @@
   };
 
   /**
-   * catch(fail): CancellableChain
+   *     catch(fail): CancellableChain
    *
    * A shortcut for `then(null, fail)`.
    *
@@ -97,7 +109,7 @@
   };
 
   /**
-   * progress(progress): CancellableChain
+   *     progress(progress): CancellableChain
    *
    * A shortcut for `then(null, null, progress)`.
    *
@@ -110,7 +122,7 @@
   };
 
   /**
-   * cancel(): CancellableChain
+   *     cancel(): CancellableChain
    *
    * Cancels each link of the chain operation by rejecting them with
    * CancelException() and calling the canceller callback.
@@ -129,7 +141,7 @@
   };
 
   /**
-   * detach(): Promise
+   *     detach(): Promise
    *
    * Returns the cancellable chain as a classic promise.
    *
@@ -143,7 +155,12 @@
     }, this.cancel.bind(this));
   };
 
-  // export
+  /*
+   * If the global `promy` exists, then `promy.CancellableChain` is added and if
+   * the global `CancellableChain` does not exist, it is also provided. Else, if
+   * the global `promy` does not exist, then only the global `CancellableChain`
+   * will be provided.
+   */
   if (root.promy) {
     root.promy.CancellableChain = CancellableChain;
     if (root.CancellableChain === undefined) {
