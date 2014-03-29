@@ -26,6 +26,7 @@ and all of them as globals if the corresponding globals do not already exist.
 This repository provides also some [tools](#promise-tools):
 
 - [`Promise based forEach`](#promise-based-foreach)
+- [`Promise based reduce`](#promise-based-reduce)
 - [`range`](#range)
 - [`CancellableChain`](#cancellablechain)
 
@@ -237,6 +238,72 @@ Inspired by [`Array.prototype.forEach`][forEach()] from Mozilla Developer Networ
     forEach(["a", "b", "c"], function (value, index, array) {
       return ajaxPostValueSomewhere(value);
     }).then(onDone, onError, onNotify);
+
+
+Promise based reduce
+--------------------
+
+A cancellable and notification propagation Promise A+ tool to iterate an array
+to reduce it to a single value.
+
+File: `promisebasedreduce.js`
+
+Version: v1.0.0
+
+If the global `promy` exists, then `promy.reduce` is added and if the global
+`reduce` does not exist, it is also provided. Else, if the global `promy` does
+not exist, then only the global `reduce` will be provided.
+
+It uses by default `promy.Promise` as promise mechanism. If `promy` is not
+provided, then the global `Promise` will be used instead.
+
+API:
+
+    reduce(array, callback[, initialValue]): Promise< reduced_value >
+
+Param:
+
+- `{Array} array` The array to parse
+- `{Function} callback` Function to execute on each element in the array.
+- `{Any} [initialValue]` Object to use as the first argument to the
+                             first call of the callback
+
+Returns:
+
+- `{Promise}` A new promise with the reduced value as fulfillment value.
+
+It executes the `callback` function once for each element present in the
+array, excluding holes in the array, receiving four arguments: the initial
+value (or value from the previous `callback` call), the value of the
+current element, the current index, and the array over which iteration is
+occurring. If the `callback` returns a promise, then the function will take
+its fulfillment value as returned value before executing the next
+iteration.
+
+`callback` is invoked with four arguments:
+
+- `previousValue`: the value previously returned in the last invocation of
+   the callback, or `initialValue`, if supplied. (See below.)
+- `currentValue`: the current element being processed in the array.
+- `index`: the index of the current element being processed in the array.
+- `array`: the array `reduce` was called upon.
+
+The first time the callback is called, `previousValue` and `currentValue`
+can be one of two values. If `initialValue` is provided in the call to
+`reduce`, then `previousValue` will be equal to `initialValue` and
+`currentValue` will be equal to the first value in the array. If no
+`initialValue` was provided, then `previousValue` will be equal to the
+first value in the array and `currentValue` will be equal to the second.
+
+Inspired by [`Array.prototype.reduce`][reduce()] from Mozilla Developer Network.
+
+[reduce()]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/Reduce
+
+    reduce([11111, 22222, 33333], function(a, b) {
+      return workerMultiply(a, b);
+    }).then(function (total) {
+      // total = 11111 * 22222 * 33333 = 8230205763786
+    });
 
 
 range()
