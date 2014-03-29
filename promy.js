@@ -61,7 +61,7 @@
   //////////////////////////////////////////////////////////////////////
 
   /**
-   * on.call(promise, type, listener): promise
+   *     on.call(promise, type, listener): promise
    *
    * Bind a listener to an object to its `_events` property to be EventEmitter
    * compatible (from nodejs). `this` object should be a promise.
@@ -88,7 +88,7 @@
   }
 
   /**
-   * emit.call(promise, type, [args*]): promise
+   *     emit.call(promise, type, [args*]): promise
    *
    * Call the listeners bound to the object in its `_events` property to be
    * EventEmitter compatible (from nodejs). `this` object should be a promise.
@@ -134,7 +134,7 @@
   //////////////////////////////////////////////////////////////////////
 
   /**
-   * objectOrFunction(v): boolean
+   *     objectOrFunction(v): boolean
    *
    * Test if `v` is of type 'object' and not null or 'function'
    *
@@ -146,7 +146,7 @@
   }
 
   /**
-   * fulfill.call(promise, value): undefined
+   *     fulfill.call(promise, value): undefined
    *
    * Fulfills the promise with the given value if not settled.
    *
@@ -165,7 +165,7 @@
   }
 
   /**
-   * reject.call(promise, value): undefined
+   *     reject.call(promise, value): undefined
    *
    * Rejects the promise with the given value if not settled.
    *
@@ -184,7 +184,7 @@
   }
 
   /**
-   * notify.call(promise, value): undefined
+   *     notify.call(promise, value): undefined
    *
    * Sends a notification to the promise with the given value if not settled.
    *
@@ -200,7 +200,7 @@
   }
 
   /**
-   * resolve.call(promise, value): undefined
+   *     resolve.call(promise, value): undefined
    *
    * Fulfill the promise with the given value. If the value is a thenable object
    * or function, the promise will be fulfilled by the thenable fulfillment
@@ -220,7 +220,7 @@
   }
 
   /**
-   * handleThenable.call(promise, value): Boolean
+   *     handleThenable.call(promise, value): Boolean
    *
    * Handles  the value  as  a possible  thenable object  or  function. If  this
    * function manage  to handle the thenable,  it will resolve the  promise with
@@ -332,7 +332,7 @@
   //////////////////////////////////////////////////////////////////////
 
   /**
-   * Promise(executor[, canceller])
+   *     Promise(executor[, canceller])
    *
    * @class Promise
    * @constructor
@@ -370,7 +370,7 @@
   // Promise.prototype.notify = notify;
 
   /**
-   * then(done, fail, progress): Promise
+   *     then(done, fail, progress): Promise
    *
    * Bind callbacks to the promise to chain operation on promise resolve.
    *
@@ -412,7 +412,7 @@
   };
 
   /**
-   * catch(fail): Promise
+   *     catch(fail): Promise
    *
    * A shortcut for `then(null, fail)`.
    *
@@ -425,7 +425,7 @@
   };
 
   /**
-   * progress(progress): Promise
+   *     progress(progress): Promise
    *
    * A shortcut for `then(null, null, progress)`.
    *
@@ -438,7 +438,7 @@
   };
 
   /**
-   * cancel(cancel): Promise
+   *     cancel(cancel): Promise
    *
    * Cancels the promise by rejecting it with CancelException() and calling the
    * canceller callback.
@@ -485,10 +485,10 @@
   promise_resolve = Promise.resolve;
 
   /**
-   * fulfill(value): Promise< value >
+   *     fulfill(value): Promise< value >
    *
-   * Creates a new promise and fulfill it to the given value. If the value is a
-   * promise, then the returned value will be the fulfillment value.
+   * Creates a new promise and fulfill it with `value`. If `value` is a promise,
+   * its resolved value will be the new promise fulfillment value.
    *
    * @param  {Any} value The value to give
    * @return {Promise} A new fulfilled promise
@@ -502,11 +502,11 @@
   };
 
   /**
-   * reject(reason): Promise< reason >
+   *     reject(reason): Promise< reason >
    *
-   * Creates a new promise and rejects it to the given reason. For consistency
-   * and debugging, the reason should be an instance of Error. If the reason is
-   * a promise, then the returned value will be the rejected reason.
+   * Creates a new promise and rejects it with `reason`. For consistency and
+   * debugging, the reason should be an instance of `Error`. If `reason` is a
+   * promise, its resolved value will be the new promise rejected reason.
    *
    * @param  {Any} reason The reason to give
    * @return {Promise} A new rejected promise
@@ -520,7 +520,7 @@
   };
 
   /**
-   * notify(notification[, answer]): Promise< answer >
+   *     notify(notification[, answer]): Promise< answer >
    *
    * Creates a new promise which notifies with the given value and resolve with
    * `answer`.
@@ -538,15 +538,16 @@
   };
 
   /**
-   * all(promises): Promise< promises_fulfilment_values >
-   * all(promises): Promise< one_rejected_reason >
+   *     all(promises): Promise< promises_fulfilment_values >
+   *     all(promises): Promise< one_rejected_reason >
    *
-   * Produces a promise that is resolved when all the given promises are
-   * resolved. The resolved value is an array of each of the resolved values of
-   * the given promises.
+   * Produces a promise that is resolved when all the given `promises` are
+   * fulfilled. The fulfillment value is an array of each of the fulfillment
+   * values of the promise array.
    *
-   * If any of the promises is rejected, the joined promise is rejected with the
-   * same error, and any remaining unfulfilled promises are cancelled.
+   * If one of the promises is rejected, the `all` promise will be rejected with
+   * the same rejected reason, and the remaining unresolved promises will be
+   * cancelled.
    *
    * @param  {Array} promises An array of promises
    * @return {Promise} A promise
@@ -591,11 +592,11 @@
   };
 
   /**
-   * race(promises): promise< first_value >
+   *     race(promises): promise< first_value >
    *
    * Produces a promise that is fulfilled when any one of the given promises is
-   * fulfilled. As soon as one of the promises is fulfilled, whether by being
-   * resolved or rejected, all the other promises are cancelled.
+   * fulfilled. As soon as one of the promises is resolved, whether by being
+   * fulfilled or rejected, all the other promises are cancelled.
    *
    * @param  {Array} promises An array of promises
    * @return {Promise} A promise
