@@ -21,30 +21,20 @@
 (function (root) {
   "use strict";
 
-  var Promise, resolve;
-
-  if (root.promy) {
-    Promise = root.promy.Promise;
-  } else {
-    Promise = root.Promise;
+  /*
+   * It uses by default `promy.Promise` as promise mechanism. If `promy` is not
+   * provided, then the global `Promise` will be used instead.
+   */
+  function newPromise(executor, canceller) {
+    var Cons = ((root.promy && root.promy.Promise) || root.Promise);
+    return new Cons(
+      executor,
+      canceller
+    );
   }
 
-  if (typeof Promise.prototype.cancel !== "function") {
-    // cancel seems to be non existent on this kind of promise
-    // cancellation is the main purpose of this library
-    console.warn("All features of the CancellableChain may not be enabled!");
-  }
-
-  if (typeof Promise !== "function") {
-    // Promise is not a constructor
-    Promise(); // throw error here
-  }
-
-  resolve = Promise.resolve;
-
-  if (typeof resolve !== "function") {
-    // Promise.resolve is not a function
-    resolve(); // throw error here
+  function resolve(v) {
+    return newPromise(function (done) { done(v); });
   }
 
   /**
@@ -150,7 +140,7 @@
    */
   CancellableChain.prototype.detach = function () {
     var promises = this._promises;
-    return new Promise(function (resolve, reject, notify) {
+    return newPromise(function (resolve, reject, notify) {
       promises[promises.length - 1].then(resolve, reject, notify);
     }, this.cancel.bind(this));
   };
