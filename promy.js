@@ -9,7 +9,7 @@
 // A Promise A+ compatible library with cancellation and notification
 // v1.0.0
 
-/*jslint indent: 2, maxlen: 80, nomen: true, node: true */
+/*jslint indent: 2, maxlen: 80, nomen: true */
 /*global setTimeout, setImmediate */
 
 // http://www.html5rocks.com/en/tutorials/es6/promises/
