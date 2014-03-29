@@ -343,7 +343,7 @@
     }
     if (typeof executor !== "function") {
       throw new TypeError("Promise(executor[, canceller]): " +
-                          "resolver must be a function");
+                          "executor must be a function");
     }
     if (typeof canceller === "function") {
       on.call(this, "promise:cancelled", canceller);
