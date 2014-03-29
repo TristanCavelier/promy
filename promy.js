@@ -24,7 +24,7 @@
    * MIT License: Copyright (c) 2013 Yehuda Katz, Tom Dale, and contributors
    */
 
-  var async, promise_cast, promy = {}, isArray = Array.isArray;
+  var async, promise_resolve, promy = {}, isArray = Array.isArray;
 
   //////////////////////////////////////////////////////////////////////
 
@@ -476,16 +476,15 @@
   }
 
   /**
-   * cast(value): Promise< value >
-   * cast(promise): promise
+   *     resolve(value): Promise< value >
    *
-   * If the value is not a promise, creates a new promise and resolve to the
-   * given value. Else it returns the promise.
+   * If `value` is not a promise, it creates a new promise and resolve with
+   * `value`. Else it returns the `value`.
    *
    * @param  {Any} value The value to give
    * @return {Promise} A new promise
    */
-  Promise.cast = function (value) {
+  Promise.resolve = function (value) {
     if (value instanceof Promise) {
       return value;
     }
@@ -493,21 +492,7 @@
       resolve(value);
     }); // no canceller needed, value canceller is used instead
   };
-  promise_cast = Promise.cast;
-
-  /**
-   * resolve(value): Promise< value >
-   *
-   * Creates a new promise and resolves it to the given value.
-   *
-   * @param  {Any} value The value to give
-   * @return {Promise} A new promise
-   */
-  Promise.resolve = function (value) {
-    return new Promise(function (resolve) {
-      resolve(value);
-    }); // no canceller needed, value canceller is used instead
-  };
+  promise_resolve = Promise.resolve;
 
   /**
    * fulfill(value): Promise< value >
@@ -519,7 +504,7 @@
    * @return {Promise} A new fulfilled promise
    */
   Promise.fulfill = function (value) {
-    var p = promise_cast(value);
+    var p = promise_resolve(value);
     return new Promise(function (resolve, reject, notify) {
       /*jslint unparam: true */
       p.then(resolve, resolve, notify);
@@ -537,7 +522,7 @@
    * @return {Promise} A new rejected promise
    */
   Promise.reject = function (reason) {
-    var p = promise_cast(reason);
+    var p = promise_resolve(reason);
     return new Promise(function (resolve, reject, notify) {
       /*jslint unparam: true */
       p.then(reject, reject, notify);
