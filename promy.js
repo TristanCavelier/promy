@@ -666,25 +666,30 @@
   };
 
   /**
-   * pending([canceller]): Promise
+   *     pending(): Promise
    *
    * Returns a defer object of a new pending promise. This object provides the
    * `promise` property which is the new promise, and also provides `fulfill`,
-   * `reject` and `notify` methods to resolve the promise.
+   * `reject` and `notify` methods to resolve the promise. `canceller` is
+   * executed on cancel if this property is defined.
    *
-   * @return {Function} [canceller] The promise canceller
    * @return {Promise} A pending promise defer object
    */
-  function pending(canceller) {
+  function pending() {
     var dict = {}, promise = new Promise(function (resolve, reject, notify) {
       dict.fulfill = resolve;
       dict.reject = reject;
       dict.notify = notify;
-    }, canceller);
+    }, function () {
+      if (typeof promise.canceller === "function") {
+        promise.canceller();
+      }
+    });
     promise.promise = promise;
     promise.fulfill = dict.fulfill;
     promise.reject = dict.reject;
     promise.notify = dict.notify;
+    promise.canceller = null;
     return promise;
     // We could also create a PendingPromise object which could already provide
     // such thing (in prototypes);
