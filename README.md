@@ -27,6 +27,7 @@ This repository provides also some [tools](#promise-tools):
 
 - [`Promise based forEach`](#promise-based-foreach)
 - [`range`](#range)
+- [`CancellableChain`](#cancellablechain)
 
 
 Promise
@@ -289,6 +290,46 @@ Inspired by [`range()`][range()] from Python 3 built-in functions.
     range(10, function (index) {
       return notifyIndex(index);
     }).then(onDone, onError, onNotify);
+
+
+CancellableChain
+----------------
+
+A cancellable and notification propagation Promise A+ tool to cancel a complete
+sequence of `then` promises since the creation of the cancellable chain.
+
+This library is useless with Promise A+ without notification and cancellation.
+
+File: `cancellablechain.js`
+
+Version: v1.0.0
+
+If the global `promy` exists, then `promy.CancellableChain` is added and if the
+global `CancellableChain` does not exist, it is also provided. Else, if the
+global `promy` does not exist, then only the global `CancellableChain` will be
+provided.
+
+API:
+
+    new CancellableChain(value)
+
+Acts like promise chain with the then function. In addition, all the sequence
+can be cancelled by calling the `cancel` method.
+
+    function doSomething() {
+      return new CancellableChain("a").
+        then(willNeverHappen).
+        detach();
+    }
+    doSomething().cancel();
+
+Differences between `CancellableChain` and `Promise`:
+
+- The `then` method returns the cancellable chain
+- The `cancel` method cancels all the then sequence since the `CancellableChain`
+  creation
+- `detach` is an additional method to return a promise which can cancel the
+  chain on `promise.cancel()`.
 
 
 License
