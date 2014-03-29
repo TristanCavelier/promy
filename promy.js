@@ -24,7 +24,7 @@
    * MIT License: Copyright (c) 2013 Yehuda Katz, Tom Dale, and contributors
    */
 
-  var async, promise_resolve, promy = {}, isArray = Array.isArray;
+  var async, promise_resolve, isArray = Array.isArray;
 
   //////////////////////////////////////////////////////////////////////
 
@@ -57,11 +57,6 @@
       "value": "CancelException"
     }
   });
-
-  promy.CancelException = CancelException;
-  if (root.CancelException === undefined) {
-    root.CancelException = CancelException;
-  }
 
   //////////////////////////////////////////////////////////////////////
 
@@ -470,11 +465,6 @@
     return this;
   };
 
-  promy.Promise = Promise;
-  if (root.Promise === undefined) {
-    root.Promise = Promise;
-  }
-
   /**
    *     resolve(value): Promise< value >
    *
@@ -680,19 +670,22 @@
     // such thing (in prototypes);
   }
 
-  promy.rejected = Promise.reject;
-  promy.fulfilled = Promise.fulfill;
-  promy.pending = pending;
-  if (root.rejected === undefined) {
-    root.rejected = Promise.reject;
-  }
-  if (root.fulfilled === undefined) {
-    root.fulfilled = Promise.fulfill;
-  }
-  if (root.pending === undefined) {
-    root.pending = pending;
-  }
+  root.promy = {
+    "CancelException": CancelException,
+    "Promise": Promise,
+    "rejected": Promise.reject,
+    "fulfilled": Promise.fulfill,
+    "pending": pending
+  };
 
-  root.promy = promy;
+  (function (promy) {
+    /*jslint forin: true */
+    var k;
+    for (k in promy) {
+      if (root[k] === undefined) {
+        root[k] = promy[k];
+      }
+    }
+  }(root.promy));
 
 }(this));
