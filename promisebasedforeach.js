@@ -69,7 +69,7 @@
    * @param  {Array} array The array to parse
    * @param  {Function} callback Function to execute for each element.
    * @param  {Any} [thisArg] Value to use as `this` when executing `callback`.
-   * @param  {Promise} A new promise with no fulfillment value.
+   * @return {Promise} A new promise with no fulfillment value.
    */
   function forEach(array, callback, thisArg) {
     if (arguments.length === 0) {
