@@ -77,10 +77,16 @@
     var promises = this._promises, l = promises.length;
     promises[l] = promises[l - 1].then(function (answer) {
       promises.shift();
-      return done(answer);
+      if (typeof done === "function") {
+        return done(answer);
+      }
+      return answer;
     }, function (reason) {
       promises.shift();
-      return fail(reason);
+      if (typeof fail === "function") {
+        return fail(reason);
+      }
+      return reason;
     }, progress);
     return this;
   };
