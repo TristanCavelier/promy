@@ -369,7 +369,7 @@ This library is useless with Promise A+ without notification and cancellation.
 
 File: `cancellablechain.js`
 
-Version: v1.0.0
+Version: v1.0.1
 
 If the global `promy` exists, then `promy.CancellableChain` is added and if the
 global `CancellableChain` does not exist, it is also provided. Else, if the
