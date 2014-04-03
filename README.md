@@ -248,7 +248,7 @@ to reduce it to a single value.
 
 File: `promisebasedreduce.js`
 
-Version: v1.0.0
+Version: v1.0.1
 
 If the global `promy` exists, then `promy.reduce` is added and if the global
 `reduce` does not exist, it is also provided. Else, if the global `promy` does
