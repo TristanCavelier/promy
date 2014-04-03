@@ -112,7 +112,7 @@
       }
       return resolve(init);
     }
-    if (array.length === 1 && i === 0) {
+    if (arguments.length < 3 && array.length === 1 && i === 0) {
       return resolve(array[0]);
     }
     current_promise = resolve();

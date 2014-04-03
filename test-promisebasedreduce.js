@@ -166,4 +166,19 @@
     setTimeout(start, 200);
   });
 
+  test("check results with an array of length 1", 1, function () {
+    stop();
+    var start = starter(), results = [], array = ["e"];
+
+    reduce(array, function (previous, current) {
+      previous.push(current);
+      return previous;
+    }, results).then(function (results) {
+      deepEqual(results, ["e"]);
+      start();
+    });
+
+    setTimeout(start, 200);
+  });
+
 }());
