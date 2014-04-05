@@ -14,8 +14,7 @@
  * the COPYING file for more details.
  */
 
-/*jslint indent: 2, maxlen: 80, nomen: true */
-/*global Promise, console */
+/*jslint indent: 2, maxlen: 80 */
 
 (function (root) {
   "use strict";

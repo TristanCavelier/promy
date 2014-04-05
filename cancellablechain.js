@@ -16,7 +16,6 @@
  */
 
 /*jslint indent: 2, maxlen: 80, nomen: true */
-/*global Promise, console */
 
 (function (root) {
   "use strict";
