@@ -94,7 +94,7 @@
     if (!(this instanceof CancellableChain)) {
       return new CancellableChain(value);
     }
-    this._promises = [resolve(value).then()];
+    this._promises = [resolve(value)];
   }
 
   /**

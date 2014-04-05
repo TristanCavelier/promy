@@ -49,8 +49,28 @@
   test("cancel should cancel all remaining promises", 2, function () {
     stop();
     var start = starter();
-    new CancellableChain().then(null, function (error) {
-      ok(error instanceof CancelException, 'then 1');
+    new CancellableChain(true).then(function (answer) {
+      ok(answer, "previous promise is resolved before cancel call.");
+    }, function () {
+      ok(false, "should not be rejected!");
+    }).then(null, function (error) {
+      ok(error instanceof CancelException, 'then 2');
+      start();
+    }).cancel();
+
+    setTimeout(start, 100);
+  });
+
+  test("cancel should cancel all promises", 3, function () {
+    stop();
+    var start = starter();
+    function never() {
+      return new Promise(function () { return; }, function () {
+        ok(true, "Cancelled");
+      });
+    }
+    new CancellableChain(never()).then(null, function (error) {
+      ok(error instanceof CancelException, "then 1");
     }).then(null, function (error) {
       ok(error instanceof CancelException, 'then 2');
       start();
@@ -63,12 +83,16 @@
     ok(new CancellableChain().detach() instanceof Promise);
   });
 
-  test("cancel normal promise should cancel the chain", function () {
+  test("cancel normal promise should cancel the chain", 2, function () {
     stop();
     var start = starter();
-
+    function never() {
+      return new Promise(function () { return; }, function () {
+        ok(true, "Cancelled");
+      });
+    }
     function doSomething() {
-      return new CancellableChain().
+      return new CancellableChain(never()).
         then(null, function (error) {
           ok(error instanceof CancelException, 'then 1');
           start();
