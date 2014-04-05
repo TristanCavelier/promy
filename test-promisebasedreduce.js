@@ -7,7 +7,7 @@
 
 /*jslint indent: 2, maxlen: 80 */
 /*global module, test, ok, deepEqual, stop, start, Promise, reduce,
-  CancelException */
+  setTimeout, CancelException */
 
 (function () {
   "use strict";
