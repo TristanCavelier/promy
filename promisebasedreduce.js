@@ -116,7 +116,7 @@
       return resolve(array[0]);
     }
     current_promise = resolve();
-    return new Promise(function (done, fail, notify) {
+    return newPromise(function (done, fail, notify) {
       function next(prev) {
         if (cancelled) {
           fail(new Error("Cancelled"));
