@@ -42,16 +42,53 @@
    * Acts like promise chain with the then function. In addition, all the
    * sequence can be cancelled by calling the `cancel` method.
    *
+   * Details:
+   *
+   *     var a = new CancellableChain("a");
+   *     var b = a.then(...);
+   *     var c = b.then(...);
+   *     var d = c.detach();
+   *     var e = d.then(...);
+   *     // with a, b or c, cancel() will cancel a, b and c
+   *     // d.cancel() will cancel a, b, c and d
+   *     // e.cancel() will just cancel e
+   *
+   * Example: chaining from function
+   *
    *     function doSomething() {
    *       return new CancellableChain("a").
-   *         then(willNeverHappen).
+   *         then(canBeCancelled).
+   *         then(soDoThisOne).
    *         detach();
+   *         // Here, it is better to detach the chain to avoid continuing it in
+   *         // the parent promises chain.
    *     }
-   *     doSomething().cancel();
+   *     doSomething().then(...);
+   *
+   * Example: use in then
+   *
+   *     function doSomething() {
+   *       return new CancellableChain("b").
+   *         then(canBeCancelled).
+   *         then(soDoThisOne);
+   *         // Here, we know that this function will be called in a `then`. We
+   *         // don't have to detach the chain because its `then` method won't
+   *         // be called.
+   *     }
+   *     Promise.resolve().then(doSomething).then(...);
+   *
+   * Differences between `CancellableChain` and `Promise`:
+   *
+   * - The `then` method returns the cancellable chain
+   * - The `cancel` method cancels all the then sequence since the
+   *   `CancellableChain` creation.
+   * - `detach` is an additional method to return a promise which can cancel the
+   *   chain on `promise.cancel()`.
+   *
    *
    * @class CancellableChain
    * @constructor
-   * @param  {Any}
+   * @param  {Any} value The value to resolve
    */
   function CancellableChain(value) {
     if (!(this instanceof CancellableChain)) {
