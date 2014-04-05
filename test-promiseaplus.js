@@ -39,7 +39,7 @@
 
   function specify(string, testFunction) {
     test(string, function () {
-      ok(true, "okay");
+      ok(true, "stub");
       if (testFunction.length === 0) {
         testFunction();
       } else {
