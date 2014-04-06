@@ -569,7 +569,7 @@
 
     function onCancel() {
       var i;
-      for (i = 0; i < length; i += 1) {
+      for (i = 0; i < promises.length; i += 1) {
         if (typeof promises[i].cancel === "function") {
           promises[i].cancel();
         }
@@ -622,7 +622,7 @@
 
     function onCancel() {
       var i;
-      for (i = 0; i < length; i += 1) {
+      for (i = 0; i < promises.length; i += 1) {
         if (typeof promises[i].cancel === "function") {
           promises[i].cancel();
         }
