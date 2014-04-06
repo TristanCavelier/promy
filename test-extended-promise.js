@@ -143,7 +143,15 @@
       ok(error instanceof CancelException, 'then 2');
       start();
     });
+  });
 
+  test("should cancels once", 1, function () {
+    stop();
+    new Promise(function () { return; }, function () {
+      ok(true, "Cancelled");
+    }).cancel().cancel();
+
+    setTimeout(start, 50);
   });
 
 }());

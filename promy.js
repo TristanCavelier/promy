@@ -438,29 +438,17 @@
   };
 
   /**
-   *     cancel(cancel): Promise
+   *     cancel(): Promise
    *
    * Cancels the promise by rejecting it with CancelException() and calling the
    * canceller callback.
    *
    * @method cancel
-   * @param  {Function} cancel The callback to call on cancel
    * @return {Promise} A new promise
    */
-  Promise.prototype.cancel = function (cancel) {
+  Promise.prototype.cancel = function () {
     if (!this.settled) {
-      // bind cancel callback to on reject in order to be called just after the
-      // cancellation.
-      if (typeof cancel === "function") {
-        return this.then(null, function (reason) {
-          if (reason instanceof CancelException) {
-            return cancel(reason);
-          }
-        });
-      }
-      reject.call(this, new CancelException("Cancelled"));
-      // call .cancel() to the inside then callback returned promise
-      emit.call(this, "promise:cancelled", {}); // "detail": undefined
+      cancel.call(this);
     }
     return this;
   };
