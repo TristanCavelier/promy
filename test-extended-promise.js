@@ -5,16 +5,20 @@
 (function () {
   "use strict";
 
-  function starter() {
-    var started = false;
-    return function () {
+  function starter(num) {
+    var started = false, ident;
+    function startFn() {
       if (!started) {
         started = true;
+        clearTimeout(ident);
         start();
       }
-    };
+    }
+    if (num) {
+      ident = setTimeout(startFn, num);
+    }
+    return startFn;
   }
-
 
   module("Promise Notifications");
 
@@ -108,7 +112,7 @@
 
   test("cancel should cancel selected promise only", 1, function () {
     stop();
-    var start = starter(), p = new Promise(function (resolve) {
+    var start = starter(100), p = new Promise(function (resolve) {
       resolve(true);
     }).then(null, function (error) {
       if (error instanceof CancelException) {
@@ -123,13 +127,11 @@
       start();
     });
     p.cancel();
-
-    setTimeout(start, 100);
   });
 
   test("should cancels itself", 1, function () {
     stop();
-    var start = starter(), p = new Promise(function (resolve) {
+    var start = starter(100), p = new Promise(function (resolve) {
       resolve();
     }).then(function () {
       p.cancel();
@@ -142,7 +144,6 @@
       start();
     });
 
-    setTimeout(start, 100);
   });
 
 }());
