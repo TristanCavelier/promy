@@ -369,8 +369,7 @@
     }
     if (typeof canceller === "function") {
       on.call(this, "promise:cancelled", function () {
-        try { canceller(); }
-        catch (ignore) {}
+        try { canceller(); } catch (ignore) {}
       });
     }
     try {
@@ -568,7 +567,7 @@
   Promise.all = function (promises) {
     var length = promises.length;
 
-    function cancel() {
+    function onCancel() {
       var i;
       for (i = 0; i < length; i += 1) {
         if (typeof promises[i].cancel === "function") {
@@ -595,13 +594,13 @@
 
       function rejecter(err) {
         reject(err);
-        cancel();
+        onCancel();
       }
 
       for (i = 0; i < length; i += 1) {
         promises[i].then(resolver(i), rejecter, notify);
       }
-    }, cancel);
+    }, onCancel);
   };
 
   /**
@@ -621,7 +620,7 @@
       return new Promise(function (done) { done(); });
     }
 
-    function cancel() {
+    function onCancel() {
       var i;
       for (i = 0; i < length; i += 1) {
         if (typeof promises[i].cancel === "function") {
@@ -636,7 +635,7 @@
         if (!ended) {
           ended = true;
           resolve(value);
-          cancel();
+          onCancel();
         }
       }
 
@@ -644,14 +643,14 @@
         if (!ended) {
           ended = true;
           reject(err);
-          cancel();
+          onCancel();
         }
       }
 
       for (i = 0; i < length; i += 1) {
         promises[i].then(resolver, rejecter, notify);
       }
-    }, cancel);
+    }, onCancel);
   };
 
   /**
