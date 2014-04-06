@@ -154,4 +154,13 @@
     setTimeout(start, 50);
   });
 
+  test("cancel should not throw error", 0, function () {
+    stop();
+    setTimeout(start, 50);
+
+    new Promise(function () { return; }, function () {
+      throw new Error("Hey");
+    }).cancel();
+  });
+
 }());

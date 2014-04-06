@@ -200,6 +200,28 @@
   }
 
   /**
+   *     cancel.call(promise): undefined
+   *
+   * Rejects the promise with CancelException if not settled, and call the on
+   * cancel listeners.
+   *
+   * @param  {Any} value The rejection value
+   */
+  function cancel() {
+    var promise = this;
+    async(function () {
+      var value = new CancelException("Cancelled");
+      if (!promise.settled) {
+        promise.isRejected = true;
+        promise.settled = true;
+        promise.rejectedReason = value;
+        emit.call(promise, "promise:cancelled", {});
+        emit.call(promise, "promise:failed", {"detail": value});
+      }
+    });
+  }
+
+  /**
    *     resolve.call(promise, value): undefined
    *
    * Fulfill the promise with the given value. If the value is a thenable object
@@ -346,7 +368,10 @@
                           "executor must be a function");
     }
     if (typeof canceller === "function") {
-      on.call(this, "promise:cancelled", canceller);
+      on.call(this, "promise:cancelled", function () {
+        try { canceller(); }
+        catch (ignore) {}
+      });
     }
     try {
       executor(resolve.bind(this), reject.bind(this), notify.bind(this));
