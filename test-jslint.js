@@ -17,6 +17,7 @@
     "promy.js",
     "test-promiseaplus.js",
     "test-extended-promise.js",
+    "test-all.js",
 
     "promisebasedforeach.js",
     "test-promisebasedforeach.js",
