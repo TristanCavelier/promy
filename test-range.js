@@ -122,7 +122,7 @@
 
     p = range(3, function () {
       ok(results.shift());
-      setTimeout(p.cancel.bind(p));
+      setTimeout(p.cancel.bind(p), 20);
       return never();
     });
 
@@ -148,7 +148,7 @@
     }
 
     p = range(3, function () {
-      setTimeout(p.cancel.bind(p));
+      setTimeout(p.cancel.bind(p), 20);
       return cancellableThing();
     });
 
