@@ -31,7 +31,10 @@
     "test-range.js",
 
     "cancellablechain.js",
-    "test-cancellablechain.js"
+    "test-cancellablechain.js",
+
+    "promisebasedjsonstringify.js",
+    "test-promisebasedjsonstringify.js"
   ];
 
   module("JSLINT");
