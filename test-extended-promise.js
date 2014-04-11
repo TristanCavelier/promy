@@ -163,4 +163,35 @@
     }).cancel();
   });
 
+  test("canceller should be called first", function () {
+    stop();
+    var start = starter(100), result = [], p;
+    p = new Promise(function () { return; }, function () {
+      result.push("canceller");
+    });
+    p.then(start, function () {
+      deepEqual(result, ["canceller"]);
+      start();
+    });
+    p.cancel();
+  });
+
+  test("inner promise canceller should be called", function () {
+    stop();
+    var start = starter(100), result = [], p, r = Promise.resolve();
+    p = Promise.resolve().then(function () {
+      return r.then(function () {
+        return r.then(function () {
+          setTimeout(p.cancel.bind(p));
+          return new Promise(function () { return; }, function () {
+            result.push("canceller");
+          });
+        });
+      });
+    });
+    p.then(start, function () {
+      deepEqual(result, ["canceller"]);
+    });
+  });
+
 }());
