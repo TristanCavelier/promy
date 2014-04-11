@@ -247,9 +247,11 @@
       }
       if (value && typeof value.then === "function") {
         on.call(promise, "promise:cancelled", function () {
-          if (typeof value.cancel === "function") {
-            value.cancel();
-          }
+          try {
+            if (typeof value.cancel === "function") {
+              value.cancel();
+            }
+          } catch (ignore) {}
         });
         value.then(function (val) {
           if (resolved) {
