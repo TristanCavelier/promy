@@ -7,19 +7,24 @@
 
 /*jslint indent: 2, maxlen: 80 */
 /*global module, test, ok, deepEqual, stop, start, Promise, reduce,
-  setTimeout, CancelException */
+  setTimeout, clearTimeout, CancelException */
 
 (function () {
   "use strict";
 
-  function starter() {
-    var started = false;
-    return function () {
+  function starter(num) {
+    var started = false, ident;
+    function startFn() {
       if (!started) {
         started = true;
+        clearTimeout(ident);
         start();
       }
-    };
+    }
+    if (num) {
+      ident = setTimeout(startFn, num);
+    }
+    return startFn;
   }
 
   module("reduce");

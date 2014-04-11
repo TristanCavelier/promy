@@ -25,21 +25,18 @@
   test("should get notified before resolve", function () {
     stop();
 
-    var results = [];
+    var start = starter(1000), results = [];
 
     new Promise(function (resolve, reject, notify) {
-      /*jslint unparam: true */
       notify(1);
       notify(2);
       resolve(3);
+      /*jslint unparam: true */
     }).then(function (value) {
       results.push(value);
-      deepEqual(results[0], 1, "Notified");
-      deepEqual(results[1], 2, "Notified");
-      deepEqual(results[2], 3, "Fulfilled");
-      deepEqual(results.length, 3, "OK");
+      deepEqual(results, [1, 2, 3]);
       start();
-    }, null, function (notification) {
+    }, start, function (notification) {
       results.push(notification);
     });
   });
