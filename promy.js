@@ -140,18 +140,6 @@
   //////////////////////////////////////////////////////////////////////
 
   /**
-   *     objectOrFunction(v): boolean
-   *
-   * Test if `v` is of type 'object' and not null or 'function'
-   *
-   * @param  {Any} v The value to test
-   * @return {Boolean} The test result
-   */
-  function objectOrFunction(v) {
-    return (typeof v === "object" && v !== null) || typeof v === "function";
-  }
-
-  /**
    *     fulfill.call(promise, value): undefined
    *
    * Fulfills the promise with the given value if not settled.
@@ -258,7 +246,7 @@
    * @return {Boolean} true if succeed to resolve
    */
   function handleThenable(value) {
-    var then = null, resolved, promise = this;
+    var resolved, promise = this;
     // the resolved variable prevents the then functions to call resolve or
     // reject more than one time.
     try {
@@ -266,38 +254,35 @@
         throw new TypeError("A promises callback cannot " +
                             "return that same promise.");
       }
-      if (objectOrFunction(value)) {
-        then = value.then;
-        if (typeof then === "function") {
-          on.call(promise, "promise:cancelled", function () {
-            if (typeof value.cancel === "function") {
-              value.cancel();
-            }
-          });
-          then.call(value, function (val) {
-            if (resolved) {
-              return true;
-            }
-            resolved = true;
-            if (value !== val) {
-              resolve.call(promise, val);
-            } else {
-              // if the returned value is the current thenable, do a `resolve`
-              // will do an infernal loop. So the promise must be fulfilled
-              // directly.
-              fulfill.call(promise, val);
-            }
-          }, function (val) {
-            if (resolved) {
-              return true;
-            }
-            resolved = true;
-            reject.call(promise, val);
-          }, function (notification) {
-            notify.call(promise, notification);
-          });
-          return true;
-        }
+      if (value && typeof value.then === "function") {
+        on.call(promise, "promise:cancelled", function () {
+          if (typeof value.cancel === "function") {
+            value.cancel();
+          }
+        });
+        value.then(function (val) {
+          if (resolved) {
+            return true;
+          }
+          resolved = true;
+          if (value !== val) {
+            resolve.call(promise, val);
+          } else {
+            // if the returned value is the current thenable, do a `resolve`
+            // will do an infernal loop. So the promise must be fulfilled
+            // directly.
+            fulfill.call(promise, val);
+          }
+        }, function (val) {
+          if (resolved) {
+            return true;
+          }
+          resolved = true;
+          reject.call(promise, val);
+        }, function (notification) {
+          notify.call(promise, notification);
+        });
+        return true;
       }
     } catch (error) {
       reject.call(promise, error);
