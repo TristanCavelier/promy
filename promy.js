@@ -148,14 +148,12 @@
    */
   function fulfill(value) {
     var promise = this;
-    async(function () {
-      if (!promise.settled) {
-        promise.isFulfilled = true;
-        promise.settled = true;
-        promise.fulfillmentValue = value;
-        emit.call(promise, "promise:resolved", {"detail": value});
-      }
-    });
+    if (!promise.settled) {
+      promise.isFulfilled = true;
+      promise.settled = true;
+      promise.fulfillmentValue = value;
+      async(emit.bind(promise, "promise:resolved", {"detail": value}));
+    }
   }
 
   /**
@@ -167,14 +165,12 @@
    */
   function reject(value) {
     var promise = this;
-    async(function () {
-      if (!promise.settled) {
-        promise.isRejected = true;
-        promise.settled = true;
-        promise.rejectedReason = value;
-        emit.call(promise, "promise:failed", {"detail": value});
-      }
-    });
+    if (!promise.settled) {
+      promise.isRejected = true;
+      promise.settled = true;
+      promise.rejectedReason = value;
+      async(emit.bind(promise, "promise:failed", {"detail": value}));
+    }
   }
 
   /**
@@ -186,11 +182,9 @@
    */
   function notify(value) {
     var promise = this;
-    async(function () {
-      if (!promise.settled) {
-        emit.call(promise, "promise:notified", {"detail": value});
-      }
-    });
+    if (!promise.settled) {
+      async(emit.bind(promise, "promise:notified", {"detail": value}));
+    }
   }
 
   /**
@@ -202,17 +196,14 @@
    * @param  {Any} value The rejection value
    */
   function cancel() {
-    var promise = this;
-    async(function () {
-      var value = new CancelException("Cancelled");
-      if (!promise.settled) {
-        promise.isRejected = true;
-        promise.settled = true;
-        promise.rejectedReason = value;
-        emit.call(promise, "promise:cancelled", {});
-        emit.call(promise, "promise:failed", {"detail": value});
-      }
-    });
+    var promise = this, value = new CancelException("Cancelled");
+    if (!promise.settled) {
+      promise.isRejected = true;
+      promise.settled = true;
+      promise.rejectedReason = value;
+      emit.call(promise, "promise:cancelled", {});
+      async(emit.bind(promise, "promise:failed", {"detail": value}));
+    }
   }
 
   /**
@@ -419,10 +410,10 @@
       on.call(this, "promise:failed", function (event) {
         invokeCallback("onReject", thenPromise, fail, event);
       });
-      on.call(this, "promise:notified", function (event) {
-        invokeNotifyCallback(thenPromise, progress, event);
-      });
     }
+    on.call(this, "promise:notified", function (event) {
+      invokeNotifyCallback(thenPromise, progress, event);
+    });
     return thenPromise;
   };
 
