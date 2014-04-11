@@ -24,7 +24,7 @@
    * MIT License: Copyright (c) 2013 Yehuda Katz, Tom Dale, and contributors
    */
 
-  var async, promise_resolve, isArray = Array.isArray;
+  var promise_resolve, isArray = Array.isArray;
 
   //////////////////////////////////////////////////////////////////////
 
@@ -123,12 +123,14 @@
 
   // Assign `async` to the setImmediate function if exist
   // else use the setTimeout as setImmediate
-  if (typeof setImmediate === "function") {
-    async = setImmediate;
-  } else {
-    async = function (fn) {
-      setTimeout.apply(null, [fn, 0].concat([].slice.call(arguments, 1)));
-    };
+  function async(fn) {
+    if (typeof setImmediate === "function") {
+      return setImmediate.apply(null, arguments);
+    }
+    return setTimeout.apply(
+      null,
+      [fn, 0].concat([].slice.call(arguments, 1))
+    );
   }
 
   //////////////////////////////////////////////////////////////////////
