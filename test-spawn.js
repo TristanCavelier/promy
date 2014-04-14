@@ -40,7 +40,7 @@
     }, start);
   });
 
-  test("throw should fulfill the promise", 1, function () {
+  test("throw should reject the promise", 1, function () {
     stop();
     var start = starter(100);
     spawn(function* () {
