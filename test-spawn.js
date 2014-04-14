@@ -72,25 +72,27 @@
       });
     }).then(function () {
       deepEqual(result, ["first", "second", "third"]);
+      start();
     }, start);
     result.push("second");
   });
 
   test("should fulfills with returned promise fulfillment value", function () {
     stop();
-    var start = starter(100), result = [];
+    var start = starter(1000);
     spawn(function* () {
       return Promise.resolve().then(function () {
         return 2;
       });
     }).then(function (value) {
       ok(value === 2);
+      start();
     }, start);
   });
 
   test("should rejects with returned promise rejected reason", function () {
     stop();
-    var start = starter(100), result = [];
+    var start = starter(1000);
     spawn(function* () {
       return Promise.resolve().then(function () {
         throw 2;
