@@ -103,4 +103,58 @@
     });
   });
 
+  test("should yield to another process", function () {
+    stop();
+    var start = starter(1000), result = [];
+    function sleep(timeout, value) {
+      return new Promise(function (done) {
+        setTimeout(done, timeout, value);
+      });
+    }
+    spawn(function* () {
+      setTimeout(result.push.bind(result, 2))
+      result.push(1);
+      result.push(yield sleep(30, 3));
+    }).then(function () {
+      deepEqual(result, [1, 2, 3]);
+      start();
+    }, start);
+  });
+
+  test("rejected promise should be cought by try/catch", function () {
+    stop();
+    var start = starter(1000);
+    spawn(function* () {
+      try {
+        yield Promise.reject(2);
+      } catch (e) {
+        return e;
+      }
+      return 0;
+    }).then(function (value) {
+      deepEqual(value, 2);
+      start();
+    }, start);
+  });
+
+  test("should cancel inner promise", 1, function () {
+    stop();
+    var start = starter(1000), r = Promise.resolve(), p, result = [];
+    p = spawn(function* () {
+      yield r.then(function () {
+        return r.then(function () {
+          setTimeout(p.cancel.bind(p));
+          return new Promise(function () { return; }, function () {
+            result.push("Cancelled");
+          });
+        });
+      });
+    });
+    p.then(start, function (value) {
+      result.push(value instanceof CancelException);
+      deepEqual(result, ["Cancelled", true]);
+      start();
+    });
+  });
+
 }());
