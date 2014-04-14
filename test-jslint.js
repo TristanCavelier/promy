@@ -30,6 +30,8 @@
     "range.js",
     "test-range.js",
 
+    "sleep.js",
+
     "cancellablechain.js",
     "test-cancellablechain.js",
 
