@@ -7,7 +7,7 @@
 
 /*jslint indent: 2, maxlen: 80 */
 /*global module, test, ok, deepEqual, stop, start, promy,
-  setTimeout */
+  setTimeout, clearTimeout */
 
 (function (root) {
   "use strict";
