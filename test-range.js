@@ -6,11 +6,15 @@
 // the COPYING file for more details.
 
 /*jslint indent: 2, maxlen: 80 */
-/*global module, test, ok, deepEqual, stop, start, Promise, range,
-  setTimeout, clearTimeout, CancelException */
+/*global module, test, ok, deepEqual, stop, start, promy,
+  setTimeout, clearTimeout */
 
-(function () {
+(function (root) {
   "use strict";
+
+  var Promise = promy.Promise,
+    CancelException = promy.CancelException,
+    range = promy.range;
 
   function starter(num) {
     var started = false, ident;
@@ -27,9 +31,22 @@
     return startFn;
   }
 
+  function tester(str, num, fun) {
+    if (root.Promise !== promy.Promise) {
+      test(str + " (no promy)", num, function () {
+        Promise = root.Promise;
+        fun();
+      });
+    }
+    test(str, num, function () {
+      Promise = promy.Promise;
+      fun();
+    });
+  }
+
   module("range");
 
-  test("check when callbacks are called without promises", 1, function () {
+  tester("check when callbacks are called without promises", 1, function () {
     stop();
     var start = starter(1000), results = [];
 
@@ -42,7 +59,7 @@
     results.push("first");
   });
 
-  test("check when callbacks are called with promises", 1, function () {
+  tester("check when callbacks are called with promises", 1, function () {
     stop();
     var start = starter(1000), results = [];
 
@@ -57,11 +74,11 @@
     }, start);
   });
 
-  test("should notify the sub promises notifications", 1, function () {
+  tester("should notify the sub promises notifications", 1, function () {
     stop();
     var start = starter(1000), results = [];
 
-    range(3, Promise.notify).then(function () {
+    range(3, promy.Promise.notify).then(function () {
       deepEqual(results, [0, 1, 2]);
       start();
     }, start, function (value) {
@@ -69,7 +86,7 @@
     });
   });
 
-  test("error should stop iteration", 3, function () {
+  tester("error should stop iteration", 3, function () {
     stop();
     var start = starter(1000), p, results = [true];
 
@@ -88,7 +105,7 @@
     });
   });
 
-  test("rejected inner promise should stop iteration", 3, function () {
+  tester("rejected inner promise should stop iteration", 3, function () {
     stop();
     var start = starter(1000), p, results = [true];
 
@@ -107,7 +124,7 @@
     });
   });
 
-  test("cancel should stop iteration", 2, function () {
+  tester("cancel should stop iteration", 2, function () {
     stop();
     var start = starter(1000), p, results = [true];
 
@@ -154,4 +171,4 @@
     });
   });
 
-}());
+}(this));
