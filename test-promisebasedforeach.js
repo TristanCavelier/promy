@@ -6,42 +6,62 @@
 // the COPYING file for more details.
 
 /*jslint indent: 2, maxlen: 80 */
-/*global module, test, ok, deepEqual, stop, start, Promise, forEach,
-  setTimeout, CancelException */
+/*global module, test, ok, deepEqual, stop, start, promy,
+  setTimeout */
 
-(function () {
+(function (root) {
   "use strict";
 
-  function starter() {
-    var started = false;
-    return function () {
+  var Promise = promy.Promise,
+    CancelException = promy.CancelException,
+    forEach = promy.forEach;
+
+  function starter(num) {
+    var started = false, ident;
+    function startFn() {
       if (!started) {
         started = true;
+        clearTimeout(ident);
         start();
       }
-    };
+    }
+    if (num) {
+      ident = setTimeout(startFn, num);
+    }
+    return startFn;
+  }
+
+  function tester(str, num, fun) {
+    if (root.Promise !== promy.Promise) {
+      test(str + " (no promy)", num, function () {
+        Promise = root.Promise;
+        fun();
+      });
+    }
+    test(str, num, function () {
+      Promise = promy.Promise;
+      fun();
+    });
   }
 
   module("forEach");
 
-  test("check when callbacks are called without promises", 1, function () {
+  tester("check when callbacks are called without promises", 1, function () {
     stop();
-    var start = starter(), results = [], array = [0, 2, 4];
+    var start = starter(1000), results = [], array = [0, 2, 4];
 
     forEach(array, function (value, index, array) {
       results.push(value, index, array);
     }).then(function () {
       deepEqual(results, ["first", 0, 0, array, 2, 1, array, 4, 2, array]);
       start();
-    });
+    }, start);
     results.push("first");
-
-    setTimeout(start, 200);
   });
 
-  test("check when callbacks are called with promises", 1, function () {
+  tester("check when callbacks are called with promises", 1, function () {
     stop();
-    var start = starter(), results = [];
+    var start = starter(1000), results = [];
 
     forEach([0, 2, 4, 6], function (index) {
       results.push(index);
@@ -51,28 +71,24 @@
     }).then(function () {
       deepEqual(results, [0, 1, 2, 3, 4, 5, 6, 7]);
       start();
-    });
-
-    setTimeout(start, 200);
+    }, start);
   });
 
-  test("should notify the sub promises notifications", 1, function () {
+  tester("should notify the sub promises notifications", 1, function () {
     stop();
-    var start = starter(), results = [], array = [0, 2, 4, 6];
+    var start = starter(1000), results = [], array = [0, 2, 4, 6];
 
-    forEach(array, Promise.notify).then(function () {
+    forEach(array, promy.Promise.notify).then(function () {
       deepEqual(results, [0, 2, 4, 6]);
       start();
-    }, null, function (event) {
+    }, start, function (event) {
       results.push(event);
     });
-
-    setTimeout(start, 200);
   });
 
-  test("error should stop iteration", 3, function () {
+  tester("error should stop iteration", 3, function () {
     stop();
-    var start = starter(), p, results = [true];
+    var start = starter(1000), p, results = [true];
 
     p = forEach([0, 2, 4, 6], function () {
       ok(results.shift());
@@ -87,13 +103,11 @@
       deepEqual(error.message, "HEY");
       start();
     });
-
-    setTimeout(start, 200);
   });
 
-  test("rejected inner promise should stop iteration", 3, function () {
+  tester("rejected inner promise should stop iteration", 3, function () {
     stop();
-    var start = starter(), p, results = [true];
+    var start = starter(1000), p, results = [true];
 
     p = forEach([0, 2, 4, 6], function () {
       ok(results.shift());
@@ -108,13 +122,11 @@
       deepEqual(error.message, "HEY");
       start();
     });
-
-    setTimeout(start, 200);
   });
 
-  test("cancel should stop iteration", 2, function () {
+  tester("cancel should stop iteration", 2, function () {
     stop();
-    var start = starter(), p, results = [true];
+    var start = starter(1000), p, results = [true];
 
     function never() {
       return new Promise(function () { return; });
@@ -133,8 +145,6 @@
       ok(error instanceof CancelException);
       start();
     });
-
-    setTimeout(start, 200);
   });
 
   test("should cancel inner promise", 2, function () {
@@ -163,4 +173,4 @@
     setTimeout(start, 200);
   });
 
-}());
+}(this));
