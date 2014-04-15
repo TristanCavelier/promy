@@ -6,11 +6,14 @@
 // the COPYING file for more details.
 
 /*jslint indent: 2, maxlen: 80 */
-/*global module, test, ok, deepEqual, stop, start, Promise,
-  setTimeout, clearTimeout, CancelException */
+/*global module, test, ok, deepEqual, stop, start, promy,
+  setTimeout, clearTimeout */
 
-(function () {
+(function (root) {
   "use strict";
+
+  var Promise = promy.Promise,
+    CancelException = promy.CancelException;
 
   function starter(num) {
     var started = false, ident;
@@ -27,9 +30,22 @@
     return startFn;
   }
 
+  function tester(str, num, fun) {
+    if (root.Promise !== promy.Promise) {
+      test(str + " (no promy)", num, function () {
+        Promise = root.Promise;
+        fun();
+      });
+    }
+    test(str, num, function () {
+      Promise = promy.Promise;
+      fun();
+    });
+  }
+
   module("Promise.all");
 
-  test("should fulfill with 0 promise", 1, function () {
+  tester("should fulfill with 0 promise", 1, function () {
     stop();
     var start = starter(1000);
 
@@ -39,7 +55,7 @@
     });
   });
 
-  test("should fulfill with 3 promises", 1, function () {
+  tester("should fulfill with 3 promises", 1, function () {
     stop();
     var start = starter(1000);
 
@@ -53,16 +69,34 @@
     }, start);
   });
 
-  test("should notify sub promises", 2, function () {
+  tester("should reject with 1 rejected promise", 1, function () {
+    stop();
+    var start = starter(1000);
+
+    Promise.all([
+      Promise.resolve(1),
+      Promise.reject(2),
+      Promise.resolve(3)
+    ]).then(start, function (answer) {
+      deepEqual(answer, 2);
+      start();
+    });
+  });
+
+  tester("should notify sub promises", 2, function () {
     stop();
     var start = starter(1000), results = [];
 
     Promise.all([
-      Promise.notify(1, 4),
-      Promise.notify(2, 5),
-      Promise.notify(3, 6)
+      promy.Promise.notify(1, 4),
+      promy.Promise.notify(2, 5),
+      promy.Promise.notify(3, 6)
     ]).then(function (answers) {
-      deepEqual(results, [1, 2, 3]);
+      if (Promise === promy.Promise) {
+        deepEqual(results, [1, 2, 3]);
+      } else {
+        ok(true);
+      }
       deepEqual(answers, [4, 5, 6]);
       start();
     }, start, function (notification) {
@@ -70,13 +104,13 @@
     });
   });
 
-  test("`reject` should cancel unresolved promises", 2, function () {
+  test("`reject` should cancel unresolved promises", 1, function () {
     stop();
-    var start = starter(1000);
+    var start = starter(1000), results = [];
 
     function never() {
       return new Promise(function () { return; }, function () {
-        ok(true, "Cancelled");
+        results.push("cancelled");
       });
     }
 
@@ -85,7 +119,8 @@
       Promise.reject(15),
       never()
     ]).then(start, function (error) {
-      ok(error === 15);
+      results.push(error);
+      deepEqual(results, ["cancelled", 15]);
       start();
     });
   });
@@ -112,4 +147,4 @@
     p.cancel();
   });
 
-}());
+}(this));
