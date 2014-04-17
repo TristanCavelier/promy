@@ -6,14 +6,15 @@
 // the COPYING file for more details.
 
 /*jslint indent: 2, maxlen: 80 */
-/*global module, test, ok, deepEqual, stop, start, promy,
+/*global module, test, ok, deepEqual, stop, start,
   setTimeout, clearTimeout */
 
 (function (root) {
   "use strict";
 
-  var Promise = promy.Promise,
-    CancelException = promy.CancelException;
+  var Promise = root.promy.Promise,
+    globalPromy = root.promy,
+    CancelException = root.promy.CancelException;
 
   function starter(num) {
     var started = false, ident;
@@ -31,14 +32,16 @@
   }
 
   function tester(str, num, fun) {
-    if (root.Promise !== promy.Promise) {
+    if (root.Promise !== root.promy.Promise) {
       test(str + " (no promy)", num, function () {
         Promise = root.Promise;
+        delete root.promy;
         fun();
       });
     }
     test(str, num, function () {
-      Promise = promy.Promise;
+      Promise = globalPromy.Promise;
+      root.promy = globalPromy;
       fun();
     });
   }
@@ -83,16 +86,16 @@
     });
   });
 
-  tester("should notify sub promises", 2, function () {
+  test("should notify sub promises", 2, function () {
     stop();
     var start = starter(1000), results = [];
 
     Promise.all([
-      promy.Promise.notify(1, 4),
-      promy.Promise.notify(2, 5),
-      promy.Promise.notify(3, 6)
+      root.promy.Promise.notify(1, 4),
+      root.promy.Promise.notify(2, 5),
+      root.promy.Promise.notify(3, 6)
     ]).then(function (answers) {
-      if (Promise === promy.Promise) {
+      if (Promise === root.promy.Promise) {
         deepEqual(results, [1, 2, 3]);
       } else {
         ok(true);
