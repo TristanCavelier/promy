@@ -1,9 +1,12 @@
 /*jslint indent: 2, plusplus: true */
-/*global module, test, ok, deepEqual, stop, start, Promise, CancelException,
+/*global module, test, ok, deepEqual, stop, start, promy,
   setTimeout, clearTimeout */
 
 (function () {
   "use strict";
+
+  var Promise = promy.Promise,
+    CancelException = promy.CancelException;
 
   function starter(num) {
     var started = false, ident;
@@ -44,14 +47,14 @@
   test("should get notified from a then", function () {
     stop();
 
-    var results = [];
+    var start = starter(1000), results = [];
 
     Promise.resolve().then(function () {
       return new Promise(function (resolve, reject, notify) {
-        /*jslint unparam: true */
         notify(1);
         notify(2);
         resolve(3);
+        /*jslint unparam: true */
       });
     }).then(function (value) {
       results.push(value);
@@ -60,14 +63,14 @@
       deepEqual(results[2], 3, "Fulfilled");
       deepEqual(results.length, 3, "OK");
       start();
-    }, null, function (notification) {
+    }, start, function (notification) {
       results.push(notification);
     });
   });
 
   test("should notify during operation", function () {
     stop();
-    var results = [];
+    var start = starter(1000), results = [];
 
     Promise.notify(true).
       then(Promise.notify.bind(null, 10), null, function (value) {
@@ -77,12 +80,8 @@
       then(function () {
         deepEqual(results, [true, "string", 10]);
         start();
-      }, null, function (value) {
+      }, start, function (value) {
         results.push(value);
-      }).
-      catch(function () {
-        ok(false, "Error should not occur!");
-        start();
       });
   });
 
