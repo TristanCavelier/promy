@@ -6,11 +6,15 @@
 // the COPYING file for more details.
 
 /*jslint indent: 2, maxlen: 80 */
-/*global module, test, ok, deepEqual, stop, start, Promise, reduce,
-  setTimeout, clearTimeout, CancelException */
+/*global module, test, ok, deepEqual, stop, start,
+  setTimeout, clearTimeout */
 
-(function () {
+(function (root) {
   "use strict";
+
+  var Promise = root.promy.Promise,
+    CancelException = root.promy.CancelException,
+    reduce = root.promy.reduce;
 
   function starter(num) {
     var started = false, ident;
@@ -186,4 +190,4 @@
     setTimeout(start, 200);
   });
 
-}());
+}(this));
