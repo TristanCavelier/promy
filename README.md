@@ -5,34 +5,38 @@ A Promise A+ compatible library with cancellation and notification
 
 File: `promy.js`
 
-Version: v1.0.0
+Version: v1.0.0 - [License: WTFPLv2](#license)
 
 Provides the global `promy` with:
 
 - [`Promise`](#promise)
 - [`Promise.resolve`](#promiseresolve)
-- [`Promise.reject`](#promisereject--rejected)
-- [`Promise.fulfill`](#promisefulfill--fulfilled)
-- [`Promise.notify`](#promisenotify)
+- [`Promise.reject`](#promisereject)
+- [`Promise.fulfill`](#promisefulfill)
+- [`Promise.notify`](#promisenotify) (*extended*)
 - [`Promise.all`](#promiseall)
 - [`Promise.race`](#promiserace)
-- [`CancelException`](#cancelexception)
-- [`fulfilled`](#promisefulfill--fulfilled)
-- [`rejected`](#promisereject--rejected)
+- [`CancelException`](#cancelexception) (*extended*)
+- [`fulfilled`](#fulfilled)
+- [`rejected`](#rejected)
 - [`pending`](#pending)
 
 and all of them as globals if the corresponding globals do not already exist.
 
-This repository provides also some [tools](#promise-tools):
+This repository provides also some [tools](#promise-tools) (most just need
+Promise A+ to work):
 
+- [`CancellableChain`](#cancellablechain) (*cancellable promise needed*)
+- [`firstFulfilled`](#firstfulfilled)
 - [`Promise based forEach`](#promise-based-foreach)
+- [`Promise based map`](#promise-based-map)
 - [`Promise based reduce`](#promise-based-reduce)
+- [`Promise based worker`](#promise-based-worker)
 - [`range`](#range)
-- [`CancellableChain`](#cancellablechain)
+- [`sleep`](#sleep)
+- [`spawn`](#spawn)
 
-
-Promise
--------
+### Promise
 
 This promise implementation is Promise A+ compatible. Instances of this promise
 are *thenable*, it means it contains a `then` method which can be used by all
@@ -102,8 +106,7 @@ Examples of notifications + cancellation:
     // as rejected reason
 
 
-Promise.resolve()
------------------
+### Promise.resolve()
 
     Promise.resolve(value): Promise< value >
 
@@ -111,35 +114,37 @@ If `value` is not a promise, it creates a new promise and resolve with
 `value`. Else it returns the `value`.
 
 
-Promise.reject() / rejected()
------------------------------
+### Promise.reject()
+
+### rejected()
 
     Promise.reject(reason): Promise< reason >
+    rejected(reason): Promise< reason >
 
 Creates a new promise and rejects it with `reason`. For consistency and
 debugging, the reason should be an instance of `Error`. If `reason` is a
 promise, its resolved value will be the new promise rejected reason.
 
 
-Promise.fulfill() / fulfilled()
--------------------------------
+### Promise.fulfill()
+
+### fulfilled()
 
     Promise.fulfill(value): Promise< value >
+    fulfilled(value): Promise< value >
 
 Creates a new promise and fulfill it with `value`. If `value` is a promise, its
 resolved value will be the new promise fulfillment value.
 
 
-Promise.notify()
-----------------
+### Promise.notify()
 
     Promise.notify(notification[, answer]): Promise< answer >
 
 Creates a new promise which notifies with `notification` and resolve with
 `answer`.
 
-Promise.all()
--------------
+### Promise.all()
 
     all(promises): Promise< promises_fulfilment_values >
     all(promises): Promise< one_rejected_reason >
@@ -152,8 +157,7 @@ If one of the promises is rejected, the `all` promise will be rejected with the
 same rejected reason, and the remaining unresolved promises will be cancelled.
 
 
-Promise.race()
---------------
+### Promise.race()
 
     race(promises): promise< first_value >
 
@@ -162,14 +166,12 @@ fulfilled. As soon as one of the promises is resolved, whether by being
 fulfilled or rejected, all the other promises are cancelled.
 
 
-CancelException
----------------
+### CancelException
 
 The Exception raised when a promise is cancelled.
 
 
-pending()
----------
+### pending()
 
     pending(): Promise
 
@@ -180,16 +182,15 @@ cancel if this property is defined.
 
 
 Promise Tools
-=============
+-------------
 
-Promise based forEach
----------------------
+### Promise based forEach
 
 A cancellable and notification propagation Promise A+ tool to iterate an array.
 
 File: `promisebasedforeach.js`
 
-Version: v1.0.1
+Version: v1.0.1 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.forEach` is added and if the global
 `forEach` does not exist, it is also provided. Else, if the global `promy` does
@@ -240,15 +241,14 @@ Inspired by [`Array.prototype.forEach`][forEach()] from Mozilla Developer Networ
     }).then(onDone, onError, onNotify);
 
 
-Promise based reduce
---------------------
+### Promise based reduce
 
 A cancellable and notification propagation Promise A+ tool to iterate an array
 to reduce it to a single value.
 
 File: `promisebasedreduce.js`
 
-Version: v1.0.1
+Version: v1.0.1 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.reduce` is added and if the global
 `reduce` does not exist, it is also provided. Else, if the global `promy` does
@@ -306,14 +306,13 @@ Inspired by [`Array.prototype.reduce`][reduce()] from Mozilla Developer Network.
     });
 
 
-range()
--------
+### range()
 
 A cancellable and notification propagation Promise A+ tool to iterate a range.
 
 File: `range.js`
 
-Version: v1.0.0
+Version: v1.0.0 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.range` is added and if the global
 `range` does not exist, it is also provided. Else, if the global `promy` does
@@ -359,8 +358,7 @@ Inspired by [`range()`][range()] from Python 3 built-in functions.
     }).then(onDone, onError, onNotify);
 
 
-CancellableChain
-----------------
+### CancellableChain
 
 A cancellable and notification propagation Promise A+ tool to cancel a complete
 sequence of `then` promises since the creation of the cancellable chain.
@@ -369,7 +367,7 @@ This library is useless with Promise A+ without notification and cancellation.
 
 File: `cancellablechain.js`
 
-Version: v1.0.2
+Version: v1.0.2 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.CancellableChain` is added and if the
 global `CancellableChain` does not exist, it is also provided. Else, if the
@@ -428,7 +426,7 @@ Differences between `CancellableChain` and `Promise`:
 
 
 License
-=======
+-------
 
 > Copyright (c) 2014 Tristan Cavelier <t.cavelier@free.fr>
 
