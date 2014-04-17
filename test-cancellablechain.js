@@ -6,11 +6,15 @@
 // the COPYING file for more details.
 
 /*jslint indent: 2, maxlen: 80 */
-/*global module, test, ok, stop, start, CancellableChain, CancelException,
-  Promise, setTimeout */
+/*global module, test, ok, stop, start, promy,
+  setTimeout */
 
 (function () {
   "use strict";
+
+  var Promise = promy.Promise,
+    CancelException = promy.CancelException,
+    CancellableChain = promy.CancellableChain;
 
   function starter() {
     var started = false;
