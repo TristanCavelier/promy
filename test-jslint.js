@@ -36,7 +36,10 @@
     "test-cancellablechain.js",
 
     "promisebasedjsonstringify.js",
-    "test-promisebasedjsonstringify.js"
+    "test-promisebasedjsonstringify.js",
+
+    "promisebasedworker.js",
+    "test-promisebasedworker.js"
   ];
 
   module("JSLINT");
