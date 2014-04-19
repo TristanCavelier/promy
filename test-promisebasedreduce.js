@@ -13,6 +13,7 @@
   "use strict";
 
   var Promise = root.promy.Promise,
+    globalPromy = root.promy,
     CancelException = root.promy.CancelException,
     reduce = root.promy.reduce;
 
@@ -31,9 +32,24 @@
     return startFn;
   }
 
+  function tester(str, num, fun) {
+    if (root.Promise !== root.promy.Promise) {
+      test(str + " (no promy)", num, function () {
+        Promise = root.Promise;
+        delete root.promy;
+        fun();
+      });
+    }
+    test(str, num, function () {
+      Promise = globalPromy.Promise;
+      root.promy = globalPromy;
+      fun();
+    });
+  }
+
   module("reduce");
 
-  test("check when callbacks are called without promises", 1, function () {
+  tester("check when callbacks are called without promises", 1, function () {
     stop();
     var start = starter(1000), results = [], array = [0, 2, 4];
 
@@ -47,7 +63,7 @@
     results.push("first");
   });
 
-  test("check when callbacks are called with promises", 1, function () {
+  tester("check when callbacks are called with promises", 1, function () {
     stop();
     var start = starter(1000);
 
@@ -76,7 +92,7 @@
     });
   });
 
-  test("error should stop iteration", 3, function () {
+  tester("error should stop iteration", 3, function () {
     stop();
     var start = starter(1000), p, results = [true];
 
@@ -95,7 +111,7 @@
     });
   });
 
-  test("rejected inner promise should stop iteration", 3, function () {
+  tester("rejected inner promise should stop iteration", 3, function () {
     stop();
     var start = starter(1000), p, results = [true];
 
