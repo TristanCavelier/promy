@@ -5,21 +5,22 @@ A Promise A+ compatible library with cancellation and notification
 
 File: `promy.js`
 
-Version: v1.0.0 - [License: WTFPLv2](#license)
+Version: v1.2.0 - [License: WTFPLv2](#license)
 
 Provides the global `promy` with:
 
 - [`Promise`](#promise)
+- [`Promise.cast`](#promisecast)
 - [`Promise.resolve`](#promiseresolve)
 - [`Promise.reject`](#promisereject)
-- [`Promise.fulfill`](#promisefulfill)
-- [`Promise.notify`](#promisenotify) (*extended*)
+- [`Promise.fulfill`](#promisefulfill) (*non standard*)
+- [`Promise.notify`](#promisenotify) (*non standard*)
 - [`Promise.all`](#promiseall)
 - [`Promise.race`](#promiserace)
-- [`CancelException`](#cancelexception) (*extended*)
-- [`fulfilled`](#fulfilled)
-- [`rejected`](#rejected)
-- [`pending`](#pending)
+- [`CancelException`](#cancelexception) (*non standard*)
+- [`fulfilled`](#fulfilled) (*non standard*)
+- [`rejected`](#rejected) (*non standard*)
+- [`pending`](#pending) (*non standard*)
 
 and all of them as globals if the corresponding globals do not already exist.
 
@@ -106,12 +107,21 @@ Examples of notifications + cancellation:
     // as rejected reason
 
 
+### Promise.cast()
+
+    cast(value): Promise< value >
+
+If `value` is not a promy promise, it creates a new promise and resolve with
+`value`. Else it returns the `value`.
+
+
 ### Promise.resolve()
 
     Promise.resolve(value): Promise< value >
 
-If `value` is not a promise, it creates a new promise and resolve with
-`value`. Else it returns the `value`.
+If `value` is not a thenable, it creates a new promise and resolve with
+`value`. Else it returns the `value`. `Promise.resolve` is also a fulfilled
+promise.
 
 
 ### Promise.reject()
@@ -121,9 +131,10 @@ If `value` is not a promise, it creates a new promise and resolve with
     Promise.reject(reason): Promise< reason >
     rejected(reason): Promise< reason >
 
-Creates a new promise and rejects it with `reason`. For consistency and
-debugging, the reason should be an instance of `Error`. If `reason` is a
-promise, its resolved value will be the new promise rejected reason.
+Produces a new resolved promise with `value` as fulfillment value.  For
+consistency and debugging, the reason should be an instance of `Error`. If
+`value` is a rejected promy promise, it just returns `value`. `reject` is
+also a rejected promise.
 
 
 ### Promise.fulfill()
@@ -133,8 +144,9 @@ promise, its resolved value will be the new promise rejected reason.
     Promise.fulfill(value): Promise< value >
     fulfilled(value): Promise< value >
 
-Creates a new promise and fulfill it with `value`. If `value` is a promise, its
-resolved value will be the new promise fulfillment value.
+Produces a new resolved promise with `value` as fulfillment value.  If `value`
+is a fulfilled promy promise, it just returns `value`. `Promise.fulfill` is also
+a fulfilled promise.
 
 
 ### Promise.notify()
