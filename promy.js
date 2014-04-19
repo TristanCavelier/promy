@@ -3,7 +3,7 @@
  *
  * A Promise A+ compatible library with cancellation and notification
  *
- * Version: v1.0.4
+ * Version: v1.1.0
  *
  * Copyright (c) 2014 Tristan Cavelier <t.cavelier@free.fr>
  * This program is free software. It comes without any warranty, to
