@@ -31,16 +31,15 @@
     return startFn;
   }
 
+  function assert() {
+    ok(false, "assertion");
+  }
+
   module("CancellableChain");
 
-  test("then returns the CancellableChain", function () {
-    var a, b;
-    a = new CancellableChain();
-    b = a.then(function () {
-      return;
-    });
-
-    ok(a === b);
+  test("then returns a CancellableChain", function () {
+    var a = (new CancellableChain()).then(function () { return; });
+    ok(a instanceof CancellableChain);
   });
 
   test("should be fulfilled with the given value", function () {
@@ -53,33 +52,24 @@
     }, start);
   });
 
-  test("cancel should cancel all remaining promises", 2, function () {
+  test("should cancel all previous chained promises", 3, function () {
     stop();
-    var start = starter(1000);
-    new CancellableChain(true).then(function (answer) {
-      ok(answer, "previous promise is resolved before cancel call.");
-    }, function () {
-      ok(false, "should not be rejected!");
-    }).then(start, function (error) {
-      ok(error instanceof CancelException, 'then 2');
-      start();
-    }).cancel();
-  });
-
-  test("cancel should cancel all promises", 3, function () {
-    stop();
-    var start = starter(1000);
+    var start = starter(1000), p;
     function never() {
       return new Promise(function () { return; }, function () {
         ok(true, "Cancelled");
       });
     }
-    new CancellableChain(never()).then(null, function (error) {
-      ok(error instanceof CancelException, "then 1");
-    }).then(start, function (error) {
-      ok(error instanceof CancelException, 'then 2');
+    p = new CancellableChain(never()).then(assert, assert);
+    p.then(start, function (e) {
+      ok(e instanceof CancelException);
+    });
+    p = p.then(assert, assert);
+    p.then(start, function (e) {
+      ok(e instanceof CancelException);
       start();
-    }).cancel();
+    });
+    p.cancel();
   });
 
   test("can be converted to normal promise", function () {
@@ -88,7 +78,7 @@
 
   test("cancel normal promise should cancel the chain", 2, function () {
     stop();
-    var start = starter(1000);
+    var start = starter(1000), p;
     function never() {
       return new Promise(function () { return; }, function () {
         ok(true, "Cancelled");
@@ -96,12 +86,15 @@
     }
     function doSomething() {
       return new CancellableChain(never()).
-        then(start, function (error) {
-          ok(error instanceof CancelException, 'then 1');
-          start();
-        }).detach();
+        then(assert, assert).
+        detach();
     }
-    doSomething().cancel();
+    p = doSomething();
+    p.then(start, function (e) {
+      ok(e instanceof CancelException);
+      start();
+    });
+    p.cancel();
   });
 
 }());

@@ -94,7 +94,7 @@
     if (!(this instanceof CancellableChain)) {
       return new CancellableChain(value);
     }
-    this._promises = [resolve(value)];
+    this._value = value;
   }
 
   /**
@@ -110,7 +110,15 @@
    * @return {CancellableChain} Itself
    */
   CancellableChain.prototype.then = function (done, fail, progress) {
-    var promises = this._promises, l = promises.length;
+    if (!this._promises) {
+      this._promises = [resolve(this._value)];
+      delete this._value;
+    }
+
+    var promises, l, cc = new CancellableChain();
+    cc._promises = this._promises.slice();
+    promises = cc._promises;
+    l = promises.length;
     promises[l] = promises[l - 1].then(function (answer) {
       promises.shift();
       if (typeof done === "function") {
@@ -124,7 +132,7 @@
       }
       return reason;
     }, progress);
-    return this;
+    return cc;
   };
 
   /**
@@ -163,6 +171,11 @@
    * @return {CancellableChain} Itself
    */
   CancellableChain.prototype.cancel = function () {
+    if (!this._promises) {
+      this._promises = [resolve(this._value)];
+      delete this._value;
+    }
+
     var i, promises = this._promises, l = promises.length;
     for (i = 0; i < l; i += 1) {
       if (typeof promises[i].cancel === "function") {
@@ -181,6 +194,11 @@
    * @return {Promise} A new promise
    */
   CancellableChain.prototype.detach = function () {
+    if (!this._promises) {
+      this._promises = [resolve(this._value)];
+      delete this._value;
+    }
+
     var promises = this._promises;
     return newPromise(function (resolve, reject, notify) {
       promises[promises.length - 1].then(resolve, reject, notify);
