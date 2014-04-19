@@ -379,7 +379,7 @@ This library is useless with Promise A+ without notification and cancellation.
 
 File: `cancellablechain.js`
 
-Version: v1.0.2 - [License: WTFPLv2](#license)
+Version: v1.0.3 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.CancellableChain` is added and if the
 global `CancellableChain` does not exist, it is also provided. Else, if the
@@ -430,7 +430,7 @@ Example: use in then
 
 Differences between `CancellableChain` and `Promise`:
 
-- The `then` method returns the cancellable chain
+- The `then` method returns a cancellable chain
 - The `cancel` method cancels all the then sequence since the `CancellableChain`
   creation.
 - `detach` is an additional method to return a promise which can cancel the
