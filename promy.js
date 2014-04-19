@@ -463,6 +463,24 @@
   };
 
   /**
+   *     cast(value): Promise< value >
+   *
+   * If `value` is not a promy promise, it creates a new promise and resolve
+   * with `value`. Else it returns the `value`.
+   *
+   * @param  {Any} value The value to give
+   * @return {Promise} A new promise
+   */
+  Promise.cast = function (value) {
+    if (value instanceof Promise) {
+      return value;
+    }
+    return new Promise(function (resolve) {
+      resolve(value);
+    }); // no canceller needed, value canceller is used instead
+  };
+
+  /**
    *     resolve(value): Promise< value >
    *
    * If `value` is not a promise, it creates a new promise and resolve with
