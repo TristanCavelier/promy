@@ -87,7 +87,7 @@
 
   test("should notify and propagate fulfillment value", function () {
     stop();
-    var results = [];
+    var start = starter(1000), results = [];
 
     Promise.resolve(true).
       then(Promise.notify.bind(null, 10)).
@@ -95,12 +95,8 @@
         results.push(answer);
         deepEqual(results, [10, true]);
         start();
-      }, null, function (value) {
+      }, start, function (value) {
         results.push(value);
-      }).
-      catch(function () {
-        ok(false, "Error should not occur!");
-        start();
       });
   });
 
@@ -108,7 +104,7 @@
 
   test("cancel should cancel selected promise only", 1, function () {
     stop();
-    var start = starter(100), p = new Promise(function (resolve) {
+    var start = starter(1000), p = new Promise(function (resolve) {
       resolve(true);
     }).then(null, function (error) {
       if (error instanceof CancelException) {
@@ -127,7 +123,7 @@
 
   test("should cancels itself", 1, function () {
     stop();
-    var start = starter(100), p = new Promise(function (resolve) {
+    var start = starter(1000), p = new Promise(function (resolve) {
       resolve();
     }).then(function () {
       p.cancel();
@@ -143,25 +139,26 @@
 
   test("should cancels once", 1, function () {
     stop();
+    var start = starter(1000);
     new Promise(function () { return; }, function () {
       ok(true, "Cancelled");
+      start();
     }).cancel().cancel();
-
-    setTimeout(start, 50);
   });
 
   test("cancel should not throw error", 0, function () {
     stop();
-    setTimeout(start, 50);
+    var start = starter(1000);
 
     new Promise(function () { return; }, function () {
+      setTimeout(start, 10);
       throw new Error("Hey");
     }).cancel();
   });
 
   test("canceller should be called first", function () {
     stop();
-    var start = starter(100), result = [], p;
+    var start = starter(1000), result = [], p;
     p = new Promise(function () { return; }, function () {
       result.push("canceller");
     });

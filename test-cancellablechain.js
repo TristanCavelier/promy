@@ -7,7 +7,7 @@
 
 /*jslint indent: 2, maxlen: 80 */
 /*global module, test, ok, stop, start, promy,
-  setTimeout */
+  setTimeout, clearTimeout */
 
 (function () {
   "use strict";
@@ -16,14 +16,19 @@
     CancelException = promy.CancelException,
     CancellableChain = promy.CancellableChain;
 
-  function starter() {
-    var started = false;
-    return function () {
+  function starter(num) {
+    var started = false, ident;
+    function startFn() {
       if (!started) {
         started = true;
+        clearTimeout(ident);
         start();
       }
-    };
+    }
+    if (num) {
+      ident = setTimeout(startFn, num);
+    }
+    return startFn;
   }
 
   module("CancellableChain");
@@ -40,34 +45,30 @@
 
   test("should be fulfilled with the given value", function () {
     stop();
-    var start = starter();
+    var start = starter(1000);
 
     new CancellableChain(true).then(function (answer) {
       ok(answer === true);
       start();
-    });
-
-    setTimeout(start, 100);
+    }, start);
   });
 
   test("cancel should cancel all remaining promises", 2, function () {
     stop();
-    var start = starter();
+    var start = starter(1000);
     new CancellableChain(true).then(function (answer) {
       ok(answer, "previous promise is resolved before cancel call.");
     }, function () {
       ok(false, "should not be rejected!");
-    }).then(null, function (error) {
+    }).then(start, function (error) {
       ok(error instanceof CancelException, 'then 2');
       start();
     }).cancel();
-
-    setTimeout(start, 100);
   });
 
   test("cancel should cancel all promises", 3, function () {
     stop();
-    var start = starter();
+    var start = starter(1000);
     function never() {
       return new Promise(function () { return; }, function () {
         ok(true, "Cancelled");
@@ -75,12 +76,10 @@
     }
     new CancellableChain(never()).then(null, function (error) {
       ok(error instanceof CancelException, "then 1");
-    }).then(null, function (error) {
+    }).then(start, function (error) {
       ok(error instanceof CancelException, 'then 2');
       start();
     }).cancel();
-
-    setTimeout(start, 100);
   });
 
   test("can be converted to normal promise", function () {
@@ -89,7 +88,7 @@
 
   test("cancel normal promise should cancel the chain", 2, function () {
     stop();
-    var start = starter();
+    var start = starter(1000);
     function never() {
       return new Promise(function () { return; }, function () {
         ok(true, "Cancelled");
@@ -97,14 +96,12 @@
     }
     function doSomething() {
       return new CancellableChain(never()).
-        then(null, function (error) {
+        then(start, function (error) {
           ok(error instanceof CancelException, 'then 1');
           start();
         }).detach();
     }
     doSomething().cancel();
-
-    setTimeout(start, 100);
   });
 
 }());

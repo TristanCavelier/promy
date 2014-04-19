@@ -152,7 +152,7 @@
 
   test("should cancel inner promise", 2, function () {
     stop();
-    var start = starter(), p;
+    var start = starter(1000), p;
 
     function cancellableThing() {
       return new Promise(function () { return; }, function () {
@@ -172,8 +172,6 @@
       ok(error instanceof CancelException);
       start();
     });
-
-    setTimeout(start, 200);
   });
 
 }(this));

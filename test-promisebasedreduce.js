@@ -35,7 +35,7 @@
 
   test("check when callbacks are called without promises", 1, function () {
     stop();
-    var start = starter(), results = [], array = [0, 2, 4];
+    var start = starter(1000), results = [], array = [0, 2, 4];
 
     reduce(array, function (previous, current) {
       previous.push(current);
@@ -45,13 +45,11 @@
       start();
     });
     results.push("first");
-
-    setTimeout(start, 200);
   });
 
   test("check when callbacks are called with promises", 1, function () {
     stop();
-    var start = starter();
+    var start = starter(1000);
 
     reduce([2, 4, 6], function (previous, current) {
       return Promise.resolve().then(function () {
@@ -61,13 +59,11 @@
       deepEqual(result, 48); // 2 * 4 * 6
       start();
     });
-
-    setTimeout(start, 200);
   });
 
   test("should notify the sub promises notifications", 1, function () {
     stop();
-    var start = starter(), results = [], array = [0, 2, 4, 6];
+    var start = starter(1000), results = [], array = [0, 2, 4, 6];
 
     reduce(array, function (previous, current) {
       /*jslint unparam: true */
@@ -78,13 +74,11 @@
     }, null, function (event) {
       results.push(event);
     });
-
-    setTimeout(start, 200);
   });
 
   test("error should stop iteration", 3, function () {
     stop();
-    var start = starter(), p, results = [true];
+    var start = starter(1000), p, results = [true];
 
     p = reduce([0, 2, 4, 6], function () {
       ok(results.shift());
@@ -99,13 +93,11 @@
       deepEqual(error.message, "HEY");
       start();
     });
-
-    setTimeout(start, 200);
   });
 
   test("rejected inner promise should stop iteration", 3, function () {
     stop();
-    var start = starter(), p, results = [true];
+    var start = starter(1000), p, results = [true];
 
     p = reduce([0, 2, 4, 6], function () {
       ok(results.shift());
@@ -120,13 +112,11 @@
       deepEqual(error.message, "HEY");
       start();
     });
-
-    setTimeout(start, 200);
   });
 
   test("cancel should stop iteration", 2, function () {
     stop();
-    var start = starter(), p, results = [true];
+    var start = starter(1000), p, results = [true];
 
     function never() {
       return new Promise(function () { return; });
@@ -145,13 +135,11 @@
       ok(error instanceof CancelException);
       start();
     });
-
-    setTimeout(start, 200);
   });
 
   test("should cancel inner promise", 2, function () {
     stop();
-    var start = starter(), p;
+    var start = starter(1000), p;
 
     function cancellableThing() {
       return new Promise(function () { return; }, function () {
@@ -171,13 +159,11 @@
       ok(error instanceof CancelException);
       start();
     });
-
-    setTimeout(start, 200);
   });
 
   test("check results with an array of length 1", 1, function () {
     stop();
-    var start = starter(), results = [], array = ["e"];
+    var start = starter(1000), results = [], array = ["e"];
 
     reduce(array, function (previous, current) {
       previous.push(current);
@@ -186,8 +172,6 @@
       deepEqual(results, ["e"]);
       start();
     });
-
-    setTimeout(start, 200);
   });
 
 }(this));
