@@ -28,7 +28,7 @@
    * MIT License: Copyright (c) 2013 Yehuda Katz, Tom Dale, and contributors
    */
 
-  var promise_resolve, isArray = Array.isArray;
+  var isArray = Array.isArray, fulfilled_promise, rejected_promise;
 
   //////////////////////////////////////////////////////////////////////
 
@@ -462,6 +462,16 @@
     return this;
   };
 
+  //////////////////////////////////////////////////////////////////////
+
+  function justReturn(v) {
+    return v;
+  }
+
+  function justThrow(v) {
+    return v;
+  }
+
   /**
    *     cast(value): Promise< value >
    *
@@ -483,56 +493,84 @@
   /**
    *     resolve(value): Promise< value >
    *
-   * If `value` is not a promise, it creates a new promise and resolve with
-   * `value`. Else it returns the `value`.
+   * If `value` is not a thenable, it creates a new promise and resolve with
+   * `value`. Else it returns the `value`. `resolve` is also a fulfilled
+   * promise.
    *
    * @param  {Any} value The value to give
    * @return {Promise} A new promise
    */
   Promise.resolve = function (value) {
-    if (value instanceof Promise) {
+    if (value && typeof value.then === "function") {
       return value;
     }
     return new Promise(function (resolve) {
       resolve(value);
     }); // no canceller needed, value canceller is used instead
   };
-  promise_resolve = Promise.resolve;
+  fulfilled_promise = Promise.resolve();
+  Promise.resolve.then = fulfilled_promise.then.bind(fulfilled_promise);
 
   /**
    *     fulfill(value): Promise< value >
    *
-   * Creates a new promise and fulfill it with `value`. If `value` is a promise,
-   * its resolved value will be the new promise fulfillment value.
+   * Produces a new resolved promise with `value` as fulfillment value.  If
+   * `value` is a fulfilled promy promise, it just returns `value`. `fulfill` is
+   * also a fulfilled promise.
    *
    * @param  {Any} value The value to give
    * @return {Promise} A new fulfilled promise
    */
   Promise.fulfill = function (value) {
-    var p = promise_resolve(value);
-    return new Promise(function (resolve, reject, notify) {
-      /*jslint unparam: true */
-      p.then(resolve, resolve, notify);
-    }, p.cancel.bind(p));
+    if (value instanceof Promise && value.isFulfilled) {
+      return value;
+    }
+    if (value && typeof value.then === "function") {
+      if (typeof value.cancel === "function") {
+        return new Promise(function (resolve, reject, notify) {
+          value.then(resolve, resolve, notify);
+          /*jslint unparam: true */
+        }, value.cancel.bind(value));
+      }
+      return value.then(null, justReturn);
+    }
+    return new Promise(function (resolve) {
+      resolve(value);
+    });
   };
+  Promise.fulfill.then = Promise.resolve.then;
 
   /**
    *     reject(reason): Promise< reason >
    *
-   * Creates a new promise and rejects it with `reason`. For consistency and
-   * debugging, the reason should be an instance of `Error`. If `reason` is a
-   * promise, its resolved value will be the new promise rejected reason.
+   * Produces a new resolved promise with `value` as fulfillment value.  For
+   * consistency and debugging, the reason should be an instance of `Error`. If
+   * `value` is a rejected promy promise, it just returns `value`. `reject` is
+   * also a rejected promise.
    *
    * @param  {Any} reason The reason to give
    * @return {Promise} A new rejected promise
    */
   Promise.reject = function (reason) {
-    var p = promise_resolve(reason);
-    return new Promise(function (resolve, reject, notify) {
+    if (reason instanceof Promise && reason.isRejected) {
+      return reason;
+    }
+    if (reason && typeof reason.then === "function") {
+      if (typeof reason.cancel === "function") {
+        return new Promise(function (resolve, reject, notify) {
+          reason.then(reject, reject, notify);
+          /*jslint unparam: true */
+        }, reason.cancel.bind(reason));
+      }
+      return reason.then(justThrow);
+    }
+    return new Promise(function (resolve, reject) {
+      reject(reason);
       /*jslint unparam: true */
-      p.then(reject, reject, notify);
-    }, p.cancel.bind(p));
+    });
   };
+  rejected_promise = Promise.reject();
+  Promise.reject.then = rejected_promise.then.bind(rejected_promise);
 
   /**
    *     notify(notification[, answer]): Promise< answer >
