@@ -54,9 +54,9 @@
   var onerror = function (error) {
     reject(error);
     error.preventDefault();
-  }, header = resolve.toString() + ";\n" +
-    reject.toString() + ";\n" +
-    notify.toString() + ";\n" +
+  }, header = resolve.toString() + "\n" +
+    reject.toString() + "\n" +
+    notify.toString() + "\n" +
     "onerror = " + onerror.toString() + ";\n";
 
   /**
