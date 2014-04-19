@@ -288,6 +288,7 @@
   // XXX rename?
   function invokeCallback(type, promise, callback, event) {
     var hasCallback, value, error, succeeded, failed;
+    if (promise.settled) { return; }
     hasCallback = typeof callback === "function";
     if (hasCallback) {
       try {

@@ -156,6 +156,21 @@
     }).cancel();
   });
 
+  test("should not call callbacks of a cancelled promise", 1, function () {
+    stop();
+    var start = starter(1000), p;
+    p = Promise.resolve().then(function () {
+      ok(false, 'should not happen (fulfilled)!');
+    }, function () {
+      ok(false, 'should not happen (rejected)!');
+    });
+    p.cancel();
+    p.then(start, function () {
+      ok(true);
+      start();
+    });
+  });
+
   test("canceller should be called first", function () {
     stop();
     var start = starter(1000), result = [], p;
