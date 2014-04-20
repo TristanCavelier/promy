@@ -57,7 +57,7 @@ Param:
 
 Methods:
 
-- `promise.then([[[onFulfill], onReject], onNotify])`
+- `promise.then([onFulfill], [onReject], [onNotify])`
 - `promise.catch(onReject)`
 - `promise.progress(onNotify)`
 - `promise.cancel()`
