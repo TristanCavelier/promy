@@ -32,19 +32,22 @@
   /**
    *     spawn(generator): Promise< returned_value >
    *
-   * XXX
+   * Use generator function to do asynchronous operations sequentialy using
+   * `yield` operator.
    *
    *     spawn(function* () {
    *       try {
-   *         var value1 = yield step1();
-   *         var value2 = yield step2(value1);
-   *         var value3 = yield step3(value2);
-   *         var value4 = yield step4(value3);
-   *         // Do something with value4
+   *         var config = yield getConfig();
+   *         config.enable_something = true;
+   *         yield sleep(1000);
+   *         yield putContif(config);
    *       } catch (e) {
-   *         // Handle any error from step1 through step4
+   *         console.error(e);
    *       }
    *     });
+   *
+   * @param  {Function} generator A generator function.
+   * @return {Promise} A new promise
    */
   function spawn(generator) {
     var promise, cancelled;
