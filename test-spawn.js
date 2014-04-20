@@ -6,11 +6,16 @@
 // the COPYING file for more details.
 
 /*jslint indent: 2, maxlen: 80 */
-/*global module, test, ok, stop, start, spawn, CancelException,
-  Promise, setTimeout */
+/*global module, test, ok, stop, start,
+  setTimeout, clearTimeout */
 
-(function () {
+(function (root) {
   "use strict";
+
+  var Promise = root.promy.Promise,
+    globalPromy = root.promy,
+    CancelException = root.promy.CancelException,
+    spawn = root.promy.spawn;
 
   function starter(num) {
     var started = false, ident;
@@ -157,4 +162,4 @@
     });
   });
 
-}());
+}(this));

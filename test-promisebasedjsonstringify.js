@@ -6,11 +6,13 @@
 // the COPYING file for more details.
 
 /*jslint indent: 2, maxlen: 80 */
-/*global module, test, ok, deepEqual, stop, start, Promise, jsonStringify,
-  setTimeout, clearTimeout, CancelException */
+/*global module, test, ok, deepEqual, stop, start,
+  setTimeout, clearTimeout */
 
-(function () {
+(function (root) {
   "use strict";
+
+  var jsonStringify = root.promy.jsonStringify;
 
   function starter(num) {
     var started = false, ident;
@@ -214,4 +216,4 @@
   //   setTimeout(start, 200);
   // });
 
-}());
+}(this));
