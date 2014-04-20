@@ -196,6 +196,106 @@ cancel if this property is defined.
 Promise Tools
 -------------
 
+### CancellableChain
+
+A cancellable and notification propagation Promise A+ tool to cancel a complete
+sequence of `then` promises since the creation of the cancellable chain.
+
+This library is useless with Promise A+ without notification and cancellation.
+
+File: `cancellablechain.js`
+
+Version: v1.0.3 - [License: WTFPLv2](#license)
+
+If the global `promy` exists, then `promy.CancellableChain` is added and if the
+global `CancellableChain` does not exist, it is also provided. Else, if the
+global `promy` does not exist, then only the global `CancellableChain` will be
+provided.
+
+API:
+
+    new CancellableChain(value)
+
+Acts like promise chain with the then function. In addition, all the sequence
+can be cancelled by calling the `cancel` method.
+
+Details:
+
+    var a = new CancellableChain("a");
+    var b = a.then(...);
+    var c = b.then(...);
+    var d = c.detach();
+    var e = d.then(...);
+    // with a, b or c, cancel() will cancel a, b and c
+    // d.cancel() will cancel a, b, c and d
+    // e.cancel() will just cancel e
+
+Example: chaining from function
+
+    function doSomething() {
+      return new CancellableChain("a").
+        then(canBeCancelled).
+        then(soDoThisOne).
+        detach();
+        // Here, it is better to detach the chain to avoid continuing it in
+        // the parent promises chain.
+    }
+    doSomething().then(...);
+
+Example: use in then
+
+    function doSomething() {
+      return new CancellableChain("b").
+        then(canBeCancelled).
+        then(soDoThisOne);
+        // Here, we know that this function will be called in a `then`. We
+        // don't have to detach the chain because its `then` method won't
+        // be called.
+    }
+    Promise.resolve().then(doSomething).then(...);
+
+Differences between `CancellableChain` and `Promise`:
+
+- The `then` method returns a cancellable chain
+- The `cancel` method cancels all the then sequence since the `CancellableChain`
+  creation.
+- `detach` is an additional method to return a promise which can cancel the
+  chain on `promise.cancel()`.
+
+
+### firstFulfilled
+
+A cancellable and notification propagation Promise A+ tool to get the first
+fulfilled promise from a list of promises.
+
+File: `firstFulfilled.js`
+
+Version: v1.0.0 - [License: WTFPLv2](#license)
+
+If the global `promy` exists, then `promy.firstFulfilled` is added and if the
+global `firstFulfilled` does not exist, it is also provided. Else, if the global
+`promy` does not exist, then only the global `firstFulfilled` will be provided.
+
+It uses by default `promy.Promise` as promise mechanism. If `promy` is not
+provided, then the global `Promise` will be used instead.
+
+API:
+
+    firstFulfilled(promises): promises< last_fulfilment_value >
+
+Param:
+
+- `{Array} promises` An array of promises
+
+Returns:
+
+- `{Promise}` A new promise
+
+Responds with the first resolved promise answer recieved. If all promises are
+rejected, it returns the last rejected promise answer received. Promises are
+cancelled only by calling `firstFulfilled(promises).cancel()`.
+
+
 ### Promise based forEach
 
 A cancellable and notification propagation Promise A+ tool to iterate an array.
@@ -250,6 +350,60 @@ Inspired by [`Array.prototype.forEach`][forEach()] from Mozilla Developer Networ
 
     forEach(["a", "b", "c"], function (value, index, array) {
       return ajaxPostValueSomewhere(value);
+    }).then(onDone, onError, onNotify);
+
+
+### Promise based map
+
+A cancellable and notification propagation Promise A+ tool to map an array.
+
+File: `promisebasedmap.js`
+
+Version: v1.0.0 - [License: WTFPLv2](#license)
+
+If the global `promy` exists, then `promy.map` is added and if the global `map`
+does not exist, it is also provided. Else, if the global `promy` does not exist,
+then only the global `map` will be provided.
+
+It uses by default `promy.Promise` as promise mechanism. If `promy` is not
+provided, then the global `Promise` will be used instead.
+
+API:
+
+    map(array, callback[, thisArg]): Promise
+
+Param:
+
+- `{Array} array` The array to parse
+- `{Function} callback` Function to execute for each element.
+- `{Any} [thisArg]` Value to use as `this` when executing `callback`.
+
+Returns:
+
+- `{Promise}` A new promise with a mapped array as fulfillment value.
+
+It executes the provided `callback` once for each element in an array, in order,
+and constructs a new array from the results asynchronously. If the `callback`
+returns a promise, then the function will wait for its fulfillment before
+executing the next iteration.
+
+`callback` is invoked with three arguments:
+
+- the element value
+- the element index
+- the array being traversed
+
+If a `thisArg` parameter is provided to `forEach`, it will be passed to
+`callback` when invoked, for use as its `this` value.  Otherwise, the value
+`undefined` will be passed for use as its `this` value.
+
+Unlike `Array.prototype.map`, you can stop the iteration by throwing something,
+or by doing a `cancel` to the returned promise if it is cancellable promise.
+
+Inspired by `Array.prototype.map` from Mozilla Developer Network.
+
+    map(["a", "b", "c"], function (value, index, array) {
+      return ajaxGetValueSomewhere(value);
     }).then(onDone, onError, onNotify);
 
 
@@ -318,6 +472,57 @@ Inspired by [`Array.prototype.reduce`][reduce()] from Mozilla Developer Network.
     });
 
 
+### Promise based worker
+
+A cancellable and notification propagation Promise A+ tool to do something in
+background.
+
+File: `promisebasedworker.js`
+
+Version: v1.0.0 - [License: WTFPLv2](#license)
+
+If the global `promy` exists, then `promy.worker` is added and if the global
+`worker` does not exist, it is also provided. Else, if the global `promy` does
+not exist, then only the global `worker` will be provided.
+
+It uses by default `promy.Promise` as promise mechanism. If `promy` is not
+provided, then the global `Promise` will be used instead.
+
+API:
+
+    worker(script) : task
+
+Param:
+
+- `{Function|String} script` The script to run in the web worker.
+
+Returns:
+
+- `{Function}` The worker function.
+
+Produces a function `task` which is able to execute a `script` in a web
+worker. Each time the `task` is launched, a new web worker is created and
+executed.
+
+`task` can take one serializable parameter which will be the `onmessage` event
+data in the web worker.
+
+`script` can be a function or a string. If the script is a string, then it
+should contains an assignement to the global `onmessage` listener.  Otherwise,
+the `script` function will be automatically assigned to `onmessage`.
+
+    var task = worker(function (event) {
+      /*global resolve, reject, notify */
+      notify(event.data + 1);
+      notify(event.data + 2);
+      resolve(event.data + 3);
+    });
+    task(3).then(console.log, console.warn, console.info);
+    // (i)> 4
+    // (i)> 5
+    //    > 6
+
+
 ### range()
 
 A cancellable and notification propagation Promise A+ tool to iterate a range.
@@ -370,71 +575,76 @@ Inspired by [`range()`][range()] from Python 3 built-in functions.
     }).then(onDone, onError, onNotify);
 
 
-### CancellableChain
+### sleep
 
-A cancellable and notification propagation Promise A+ tool to cancel a complete
-sequence of `then` promises since the creation of the cancellable chain.
+A cancellable Promise A+ tool to sleep asynchronous process.
 
-This library is useless with Promise A+ without notification and cancellation.
+File: `sleep.js`
 
-File: `cancellablechain.js`
+Version: 1.0.0 - [License: WTFPLv2](#license)
 
-Version: v1.0.3 - [License: WTFPLv2](#license)
+If the global `promy` exists, then `promy.sleep` is added and if the global
+`sleep` does not exist, it is also provided. Else, if the global `promy` does
+not exist, then only the global `sleep` will be provided.
 
-If the global `promy` exists, then `promy.CancellableChain` is added and if the
-global `CancellableChain` does not exist, it is also provided. Else, if the
-global `promy` does not exist, then only the global `CancellableChain` will be
-provided.
+It uses by default `promy.Promise` as promise mechanism. If `promy` is not
+provided, then the global `Promise` will be used instead.
 
 API:
 
-    new CancellableChain(value)
+    sleep(delay, [value]): promise< value >
 
-Acts like promise chain with the then function. In addition, all the sequence
-can be cancelled by calling the `cancel` method.
+Param:
 
-Details:
+- `{Number}` delay The time to sleep.
+- `{Any} [value]` The value to resolve.
 
-    var a = new CancellableChain("a");
-    var b = a.then(...);
-    var c = b.then(...);
-    var d = c.detach();
-    var e = d.then(...);
-    // with a, b or c, cancel() will cancel a, b and c
-    // d.cancel() will cancel a, b, c and d
-    // e.cancel() will just cancel e
+Returns:
 
-Example: chaining from function
+- `{Promise}` A new promise.
 
-    function doSomething() {
-      return new CancellableChain("a").
-        then(canBeCancelled).
-        then(soDoThisOne).
-        detach();
-        // Here, it is better to detach the chain to avoid continuing it in
-        // the parent promises chain.
-    }
-    doSomething().then(...);
+Produces a new promise which will resolve with `value` after `delay`
+milliseconds.
 
-Example: use in then
 
-    function doSomething() {
-      return new CancellableChain("b").
-        then(canBeCancelled).
-        then(soDoThisOne);
-        // Here, we know that this function will be called in a `then`. We
-        // don't have to detach the chain because its `then` method won't
-        // be called.
-    }
-    Promise.resolve().then(doSomething).then(...);
+### spawn
 
-Differences between `CancellableChain` and `Promise`:
+A cancellable and notification propagation Promise A+ tool to write asynchronous
+operations with a simple genetor function.
 
-- The `then` method returns a cancellable chain
-- The `cancel` method cancels all the then sequence since the `CancellableChain`
-  creation.
-- `detach` is an additional method to return a promise which can cancel the
-  chain on `promise.cancel()`.
+File: `spawn.js`
+
+Version: 1.0.0 - [License: WTFPLv2](#license)
+
+If the global `promy` exists, then `promy.spawn` is added and if the global
+`spawn` does not exist, it is also provided. Else, if the global `promy` does
+not exist, then only the global `spawn` will be provided.
+
+API:
+
+    spawn(generator): Promise< returned_value >
+
+Param:
+
+- `{Function} generator` A generator function.
+
+Returns:
+
+- `{Promise}` A new promise
+
+Use generator function to do asynchronous operations sequentialy using `yield`
+operator.
+
+    spawn(function* () {
+      try {
+        var config = yield getConfig();
+        config.enable_something = true;
+        yield sleep(1000);
+        yield putContif(config);
+      } catch (e) {
+        console.error(e);
+      }
+    });
 
 
 License
