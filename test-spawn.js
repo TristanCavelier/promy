@@ -142,6 +142,20 @@
     }, start);
   });
 
+  test("should notify from inner promises", 1, function () {
+    stop();
+    var start = starter(1000), result = [];
+    spawn(function* () {
+      yield Promise.notify(1);
+      yield Promise.notify(2);
+    }).then(function (value) {
+      deepEqual(result, [1, 2]);
+      start();
+    }, start, function (a) {
+      result.push(a);
+    });
+  });
+
   test("should cancel inner promise", 1, function () {
     stop();
     var start = starter(1000), r = Promise.resolve(), p, result = [];
