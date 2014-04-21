@@ -18,6 +18,7 @@
     "test-promiseaplus.js",
     "test-extended-promise.js",
     "test-all.js",
+    "test-race.js",
 
     "promisebasedforeach.js",
     "test-promisebasedforeach.js",
