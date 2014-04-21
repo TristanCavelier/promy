@@ -1,24 +1,24 @@
-/*
- * CancellableChain
- *
- * A cancellable and notification propagation Promise A+ tool to cancel a
- * complete sequence of `then` promises since the creation of the cancellable
- * chain.
- *
- * Version: v1.0.3
- *
- * Copyright (c) 2014 Tristan Cavelier <t.cavelier@free.fr>
- * This program is free software. It comes without any warranty, to
- * the extent permitted by applicable law. You can redistribute it
- * and/or modify it under the terms of the Do What The Fuck You Want
- * To Public License, Version 2, as published by Sam Hocevar. See
- * the COPYING file for more details.
- */
-
 /*jslint indent: 2, maxlen: 80, nomen: true */
 
-(function (root) {
+(function factory(root) {
   "use strict";
+
+  /*
+   * CancellableChain
+   *
+   * A cancellable and notification propagation Promise A+ tool to cancel a
+   * complete sequence of `then` promises since the creation of the cancellable
+   * chain.
+   *
+   * Version: v1.1.0
+   *
+   * Copyright (c) 2014 Tristan Cavelier <t.cavelier@free.fr>
+   * This program is free software. It comes without any warranty, to
+   * the extent permitted by applicable law. You can redistribute it
+   * and/or modify it under the terms of the Do What The Fuck You Want
+   * To Public License, Version 2, as published by Sam Hocevar. See
+   * the COPYING file for more details.
+   */
 
   /*
    * It uses by default `promy.Promise` as promise mechanism. If `promy` is not
@@ -219,5 +219,17 @@
   } else {
     root.CancellableChain = CancellableChain;
   }
+
+  /**
+   * Prepare `toScript` function to export easily this library as a string.
+   */
+  Object.defineProperty(CancellableChain, "toScript", {
+    "configurable": true,
+    "enumerable": false,
+    "writable": true,
+    "value": function () {
+      return "(" + factory.toString() + "(this));";
+    }
+  });
 
 }(this));

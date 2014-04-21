@@ -1,26 +1,26 @@
-/*
- * Promy
- *
- * A Promise A+ compatible library with cancellation and notification
- *
- * Version: v1.2.0
- *
- * Copyright (c) 2014 Tristan Cavelier <t.cavelier@free.fr>
- * This program is free software. It comes without any warranty, to
- * the extent permitted by applicable law. You can redistribute it
- * and/or modify it under the terms of the Do What The Fuck You Want
- * To Public License, Version 2, as published by Sam Hocevar. See
- * the COPYING file for more details.
- */
-
 /*jslint indent: 2, maxlen: 80, nomen: true */
 /*global setTimeout, setImmediate */
 
-// http://www.html5rocks.com/en/tutorials/es6/promises/
-// https://people.mozilla.org/~jorendorff/es6-draft.html
-
-(function (root) {
+(function factory(root) {
   "use strict";
+
+  /*
+   * Promy
+   *
+   * A Promise A+ compatible library with cancellation and notification
+   *
+   * Version: v1.3.0
+   *
+   * Copyright (c) 2014 Tristan Cavelier <t.cavelier@free.fr>
+   * This program is free software. It comes without any warranty, to
+   * the extent permitted by applicable law. You can redistribute it
+   * and/or modify it under the terms of the Do What The Fuck You Want
+   * To Public License, Version 2, as published by Sam Hocevar. See
+   * the COPYING file for more details.
+   */
+
+  // http://www.html5rocks.com/en/tutorials/es6/promises/
+  // https://people.mozilla.org/~jorendorff/es6-draft.html
 
   /*
    * This part is inspired from RSVP.js
@@ -741,5 +741,27 @@
       }
     }
   }(root.promy));
+
+  /**
+   * Prepare `toScript` function to export easily this library as a string. All
+   * functions and objects bounded to `promy` can provide a `toScript` function
+   * which will be appended to the `promy` one to build a bundle of libraries as
+   * a string.
+   */
+  Object.defineProperty(root.promy, "toScript", {
+    "configurable": true,
+    "enumerable": false,
+    "writable": true,
+    "value": function () {
+      /*jslint forin: true */
+      var k, script = "(" + factory.toString() + "(this));";
+      for (k in root.promy) {
+        if (typeof root.promy[k].toScript === "function") {
+          script += "\n" + root.promy[k].toScript();
+        }
+      }
+      return script;
+    }
+  });
 
 }(this));

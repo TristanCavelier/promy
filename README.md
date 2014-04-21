@@ -5,7 +5,7 @@ A Promise A+ compatible library with cancellation and notification
 
 File: `promy.js`
 
-Version: v1.2.0 - [License: WTFPLv2](#license)
+Version: v1.3.0 - [License: WTFPLv2](#license)
 
 Provides the global `promy` with:
 
@@ -36,6 +36,11 @@ Promise A+ to work):
 - [`range`](#range)
 - [`sleep`](#sleep)
 - [`spawn`](#spawn)
+
+It also provides a `toScript` function which return the library script as a
+string. All functions and objects bounded to `promy` can provide a `toScript`
+function which will be appended to the `promy` one to build a bundle of
+libraries as a string.
 
 ### Promise
 
@@ -205,12 +210,13 @@ This library is useless with Promise A+ without notification and cancellation.
 
 File: `cancellablechain.js`
 
-Version: v1.0.3 - [License: WTFPLv2](#license)
+Version: v1.1.0 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.CancellableChain` is added and if the
 global `CancellableChain` does not exist, it is also provided. Else, if the
 global `promy` does not exist, then only the global `CancellableChain` will be
-provided.
+provided. It also provides `CancellableChain.toScript`, a function which return
+this library script as a string.
 
 API:
 
@@ -270,11 +276,13 @@ fulfilled promise from a list of promises.
 
 File: `firstFulfilled.js`
 
-Version: v1.0.0 - [License: WTFPLv2](#license)
+Version: v1.1.0 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.firstFulfilled` is added and if the
 global `firstFulfilled` does not exist, it is also provided. Else, if the global
 `promy` does not exist, then only the global `firstFulfilled` will be provided.
+It also provides `firstFulfilled.toScript`, a function which return this library
+script as a string.
 
 It uses by default `promy.Promise` as promise mechanism. If `promy` is not
 provided, then the global `Promise` will be used instead.
@@ -302,11 +310,12 @@ A cancellable and notification propagation Promise A+ tool to iterate an array.
 
 File: `promisebasedforeach.js`
 
-Version: v1.0.1 - [License: WTFPLv2](#license)
+Version: v1.1.0 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.forEach` is added and if the global
 `forEach` does not exist, it is also provided. Else, if the global `promy` does
-not exist, then only the global `forEach` will be provided.
+not exist, then only the global `forEach` will be provided. It also provides
+`forEach.toScript`, a function which return this library script as a string.
 
 It uses by default `promy.Promise` as promise mechanism. If `promy` is not
 provided, then the global `Promise` will be used instead.
@@ -359,11 +368,12 @@ A cancellable and notification propagation Promise A+ tool to map an array.
 
 File: `promisebasedmap.js`
 
-Version: v1.0.0 - [License: WTFPLv2](#license)
+Version: v1.1.0 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.map` is added and if the global `map`
 does not exist, it is also provided. Else, if the global `promy` does not exist,
-then only the global `map` will be provided.
+then only the global `map` will be provided. It also provides `map.toScript`, a
+function which return this library script as a string.
 
 It uses by default `promy.Promise` as promise mechanism. If `promy` is not
 provided, then the global `Promise` will be used instead.
@@ -414,11 +424,12 @@ to reduce it to a single value.
 
 File: `promisebasedreduce.js`
 
-Version: v1.0.1 - [License: WTFPLv2](#license)
+Version: v1.1.0 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.reduce` is added and if the global
 `reduce` does not exist, it is also provided. Else, if the global `promy` does
-not exist, then only the global `reduce` will be provided.
+not exist, then only the global `reduce` will be provided. It also provides
+`reduce.toScript`, a function which return this library script as a string.
 
 It uses by default `promy.Promise` as promise mechanism. If `promy` is not
 provided, then the global `Promise` will be used instead.
@@ -479,11 +490,12 @@ background.
 
 File: `promisebasedworker.js`
 
-Version: v1.0.0 - [License: WTFPLv2](#license)
+Version: v1.1.0 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.worker` is added and if the global
 `worker` does not exist, it is also provided. Else, if the global `promy` does
-not exist, then only the global `worker` will be provided.
+not exist, then only the global `worker` will be provided. It also provides
+`worker.toScript`, a function which return this library script as a string.
 
 It uses by default `promy.Promise` as promise mechanism. If `promy` is not
 provided, then the global `Promise` will be used instead.
@@ -529,11 +541,12 @@ A cancellable and notification propagation Promise A+ tool to iterate a range.
 
 File: `range.js`
 
-Version: v1.0.0 - [License: WTFPLv2](#license)
+Version: v1.1.0 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.range` is added and if the global
 `range` does not exist, it is also provided. Else, if the global `promy` does
-not exist, then only the global `range` will be provided.
+not exist, then only the global `range` will be provided. It also provides
+`range.toScript`, a function which return this library script as a string.
 
 It uses by default `promy.Promise` as promise mechanism. If `promy` is not
 provided, then the global `Promise` will be used instead.
@@ -581,11 +594,12 @@ A cancellable Promise A+ tool to sleep asynchronous process.
 
 File: `sleep.js`
 
-Version: 1.0.0 - [License: WTFPLv2](#license)
+Version: 1.1.0 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.sleep` is added and if the global
 `sleep` does not exist, it is also provided. Else, if the global `promy` does
-not exist, then only the global `sleep` will be provided.
+not exist, then only the global `sleep` will be provided. It also provides
+`sleep.toScript`, a function which return this library script as a string.
 
 It uses by default `promy.Promise` as promise mechanism. If `promy` is not
 provided, then the global `Promise` will be used instead.
@@ -614,11 +628,12 @@ operations with a simple genetor function.
 
 File: `spawn.js`
 
-Version: 1.0.0 - [License: WTFPLv2](#license)
+Version: 1.1.0 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.spawn` is added and if the global
 `spawn` does not exist, it is also provided. Else, if the global `promy` does
-not exist, then only the global `spawn` will be provided.
+not exist, then only the global `spawn` will be provided. It also provides
+`spawn.toScript`, a function which return this library script as a string.
 
 API:
 

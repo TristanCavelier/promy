@@ -1,24 +1,24 @@
-/*
- * Promise based Worker
- *
- * A cancellable and notification propagation Promise A+ tool to do something in
- * background.
- *
- * Version: v1.0.0
- *
- * Copyright (c) 2014 Tristan Cavelier <t.cavelier@free.fr>
- * This program is free software. It comes without any warranty, to
- * the extent permitted by applicable law. You can redistribute it
- * and/or modify it under the terms of the Do What The Fuck You Want
- * To Public License, Version 2, as published by Sam Hocevar. See
- * the COPYING file for more details.
- */
-
 /*jslint indent: 2, maxlen: 80 */
 /*global window, Blob, Worker */
 
-(function (root) {
+(function factory(root) {
   "use strict";
+
+  /*
+   * Promise based Worker
+   *
+   * A cancellable and notification propagation Promise A+ tool to do something
+   * in background.
+   *
+   * Version: v1.1.0
+   *
+   * Copyright (c) 2014 Tristan Cavelier <t.cavelier@free.fr>
+   * This program is free software. It comes without any warranty, to
+   * the extent permitted by applicable law. You can redistribute it
+   * and/or modify it under the terms of the Do What The Fuck You Want
+   * To Public License, Version 2, as published by Sam Hocevar. See
+   * the COPYING file for more details.
+   */
 
   /*
    * It uses by default `promy.Promise` as promise mechanism. If `promy` is not
@@ -144,5 +144,17 @@
   } else {
     root.worker = worker;
   }
+
+  /**
+   * Prepare `toScript` function to export easily this library as a string.
+   */
+  Object.defineProperty(worker, "toScript", {
+    "configurable": true,
+    "enumerable": false,
+    "writable": true,
+    "value": function () {
+      return "(" + factory.toString() + "(this));";
+    }
+  });
 
 }(this));
