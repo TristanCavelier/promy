@@ -1,0 +1,191 @@
+// Copyright (c) 2014 Tristan Cavelier <t.cavelier@free.fr>
+// This program is free software. It comes without any warranty, to
+// the extent permitted by applicable law. You can redistribute it
+// and/or modify it under the terms of the Do What The Fuck You Want
+// To Public License, Version 2, as published by Sam Hocevar. See
+// the COPYING file for more details.
+
+/*jslint indent: 2, maxlen: 80 */
+/*global module, test, ok, deepEqual, stop, start,
+  setTimeout, clearTimeout */
+
+(function (root) {
+  "use strict";
+
+  var Promise = root.promy.Promise,
+    globalPromy = root.promy,
+    CancelException = root.promy.CancelException,
+    map = root.promy.map;
+
+  function starter(num) {
+    var started = false, ident;
+    function startFn() {
+      if (!started) {
+        started = true;
+        clearTimeout(ident);
+        start();
+      }
+    }
+    if (num) {
+      ident = setTimeout(startFn, num);
+    }
+    return startFn;
+  }
+
+  function tester(str, num, fun) {
+    if (root.Promise !== root.promy.Promise) {
+      test(str + " (no promy)", num, function () {
+        Promise = root.Promise;
+        delete root.promy;
+        fun();
+      });
+    }
+    test(str, num, function () {
+      Promise = globalPromy.Promise;
+      root.promy = globalPromy;
+      fun();
+    });
+  }
+
+  module("map");
+
+  tester("check when callbacks are called without promises", 1, function () {
+    stop();
+    var start = starter(1000), results = [], array = [0, 2, 4];
+
+    map(array, function (value, index, array) {
+      results.push(value, index, array);
+    }).then(function () {
+      deepEqual(results, ["first", 0, 0, array, 2, 1, array, 4, 2, array]);
+      start();
+    }, start);
+    results.push("first");
+  });
+
+  tester("check when callbacks are called with promises", 1, function () {
+    stop();
+    var start = starter(1000), results = [];
+
+    map([0, 2, 4, 6], function (index) {
+      results.push(index);
+      return Promise.resolve(index + 1).then(function (index) {
+        results.push(index);
+      });
+    }).then(function () {
+      deepEqual(results, [0, 1, 2, 3, 4, 5, 6, 7]);
+      start();
+    }, start);
+  });
+
+  tester("check map resolved value", 1, function () {
+    stop();
+    var start = starter(1000);
+
+    map([0, 2, 4, 6], function (index) {
+      return Promise.resolve(index + 1).then(function (index) {
+        return index;
+      });
+    }).then(function (result) {
+      deepEqual(result, [1, 3, 5, 7]);
+      start();
+    }, start);
+  });
+
+  test("should notify the sub promises notifications", 1, function () {
+    stop();
+    var start = starter(1000), results = [], array = [0, 2, 4, 6];
+
+    map(array, root.promy.Promise.notify).then(function () {
+      deepEqual(results, [0, 2, 4, 6]);
+      start();
+    }, start, function (event) {
+      results.push(event);
+    });
+  });
+
+  tester("error should stop iteration", 3, function () {
+    stop();
+    var start = starter(1000), p, results = [true];
+
+    p = map([0, 2, 4, 6], function () {
+      ok(results.shift());
+      throw new TypeError("HEY");
+    });
+
+    p.then(function () {
+      ok(false, "should not be fulfilled");
+      start();
+    }, function (error) {
+      deepEqual(error.name, "TypeError");
+      deepEqual(error.message, "HEY");
+      start();
+    });
+  });
+
+  tester("rejected inner promise should stop iteration", 3, function () {
+    stop();
+    var start = starter(1000), p, results = [true];
+
+    p = map([0, 2, 4, 6], function () {
+      ok(results.shift());
+      return Promise.reject(new TypeError("HEY"));
+    });
+
+    p.then(function () {
+      ok(false, "should not be fulfilled");
+      start();
+    }, function (error) {
+      deepEqual(error.name, "TypeError");
+      deepEqual(error.message, "HEY");
+      start();
+    });
+  });
+
+  test("cancel should stop iteration", 2, function () {
+    stop();
+    var start = starter(1000), p, results = [true];
+
+    function never() {
+      return new Promise(function () { return; });
+    }
+
+    p = map([0, 2, 4, 6], function () {
+      ok(results.shift());
+      setTimeout(p.cancel.bind(p));
+      return never();
+    });
+
+    p.then(function () {
+      ok(false, "should not be fulfilled");
+      start();
+    }, function (error) {
+      ok(error instanceof CancelException);
+      start();
+    });
+  });
+
+  test("should cancel inner promise", 2, function () {
+    stop();
+    var start = starter(1000), p;
+
+    function cancellableThing() {
+      return new Promise(function () { return; }, function () {
+        ok(true, "Cancelled");
+      });
+    }
+
+    p = map([0, 2, 4, 6], function () {
+      setTimeout(p.cancel.bind(p));
+      return cancellableThing();
+    });
+
+    p.then(function () {
+      ok(false, "should not be fulfilled");
+      start();
+    }, function (error) {
+      ok(error instanceof CancelException);
+      start();
+    });
+  });
+
+}(this));

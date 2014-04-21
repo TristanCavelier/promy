@@ -23,6 +23,7 @@
     "test-promisebasedforeach.js",
 
     "promisebasedmap.js",
+    "test-promisebasedmap.js",
 
     "promisebasedreduce.js",
     "test-promisebasedreduce.js",
