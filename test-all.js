@@ -91,9 +91,9 @@
     var start = starter(1000), results = [];
 
     Promise.all([
-      root.promy.Promise.notify(1, 4),
-      root.promy.Promise.notify(2, 5),
-      root.promy.Promise.notify(3, 6)
+      Promise.notify(1, 4),
+      Promise.notify(2, 5),
+      Promise.notify(3, 6)
     ]).then(function (answers) {
       if (Promise === root.promy.Promise) {
         deepEqual(results, [1, 2, 3]);
