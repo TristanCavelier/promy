@@ -657,10 +657,6 @@
   Promise.race = function (promises) {
     var length = promises.length;
 
-    if (length === 0) {
-      return new Promise(function (done) { done(); });
-    }
-
     function onCancel() {
       var i;
       for (i = 0; i < promises.length; i += 1) {
