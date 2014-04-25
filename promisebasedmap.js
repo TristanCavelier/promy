@@ -79,31 +79,40 @@
     if (typeof callback !== "function") {
       throw new TypeError("map(): argument 2 is not a function");
     }
-    var cancelled, current_promise = resolve(), result = [];
+    var cancelled, p1 = resolve(), p2, result = [];
     return newPromise(function (done, fail, notify) {
       var i = 0;
       function next(value) {
         if (i > 0) {
           result[i - 1] = value;
         }
-        if (cancelled) {
-          fail(new Error("Cancelled"));
-          return;
-        }
         if (i < array.length) {
-          current_promise =
-            current_promise.then(callback.bind(thisArg, array[i], i, array));
-          current_promise.then(next, fail, notify);
+          try {
+            value = callback.call(thisArg, array[i], i, array);
+          } catch (e) {
+            fail(e);
+            return;
+          }
+          if (cancelled) { return; }
           i += 1;
+          if (value && typeof value.then === "function") {
+            p1 = value;
+            p2 = value.then(next, fail, notify);
+          } else {
+            p2 = p2.then(next, fail, notify);
+          }
           return;
         }
         done(result);
       }
-      next();
+      p2 = p1.then(next);
     }, function () {
       cancelled = true;
-      if (typeof current_promise.cancel === "function") {
-        current_promise.cancel();
+      if (typeof p1.cancel === "function") {
+        p1.cancel();
+      }
+      if (typeof p2.cancel === "function") {
+        p2.cancel();
       }
     });
   }
