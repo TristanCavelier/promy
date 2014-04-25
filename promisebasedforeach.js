@@ -83,14 +83,11 @@
     if (typeof callback !== "function") {
       throw new TypeError("forEach(): argument 2 is not a function");
     }
-    var cancelled, current_promise = resolve();
+    var cancelled, p1 = resolve(), p2;
     return newPromise(function (done, fail, notify) {
       var i = 0, value;
       function next() {
-        if (cancelled) {
-          fail(new Error("Cancelled"));
-          return;
-        }
+        // if cancelled before `next` execution, `next` should not be called
         if (i < array.length) {
           try {
             value = callback.call(thisArg, array[i], i, array);
@@ -98,20 +95,27 @@
             fail(e);
             return;
           }
+          // can be cancelled during callback
+          if (cancelled) { return; }
           i += 1;
           if (value && typeof value.then === "function") {
-            current_promise = value;
+            p1 = value;
+            p2 = value.then(next, fail, notify);
+          } else {
+            p2 = p2.then(next, fail, notify);
           }
-          current_promise.then(next, fail, notify);
           return;
         }
         done();
       }
-      current_promise.then(next);
+      p2 = p1.then(next);
     }, function () {
       cancelled = true;
-      if (typeof current_promise.cancel === "function") {
-        current_promise.cancel();
+      if (typeof p1.cancel === "function") {
+        p1.cancel();
+      }
+      if (typeof p2.cancel === "function") {
+        p2.cancel();
       }
     });
   }
