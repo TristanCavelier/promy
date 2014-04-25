@@ -85,22 +85,29 @@
     }
     var cancelled, current_promise = resolve();
     return newPromise(function (done, fail, notify) {
-      var i = 0;
+      var i = 0, value;
       function next() {
         if (cancelled) {
           fail(new Error("Cancelled"));
           return;
         }
         if (i < array.length) {
-          current_promise =
-            current_promise.then(callback.bind(thisArg, array[i], i, array));
-          current_promise.then(next, fail, notify);
+          try {
+            value = callback.call(thisArg, array[i], i, array);
+          } catch (e) {
+            fail(e);
+            return;
+          }
           i += 1;
+          if (value && typeof value.then === "function") {
+            current_promise = value;
+          }
+          current_promise.then(next, fail, notify);
           return;
         }
         done();
       }
-      next();
+      current_promise.then(next);
     }, function () {
       cancelled = true;
       if (typeof current_promise.cancel === "function") {
