@@ -159,10 +159,10 @@
    */
   function fulfill(value) {
     var promise = this;
-    if (!promise.settled) {
-      setNonEnumerable(promise, "isFulfilled", true);
-      setNonEnumerable(promise, "settled", true);
-      setNonEnumerable(promise, "fulfillmentValue", value);
+    if (!promise._settled) {
+      setNonEnumerable(promise, "_fulfilled", true);
+      setNonEnumerable(promise, "_settled", true);
+      setNonEnumerable(promise, "_fulfillmentValue", value);
       async(emit.bind(promise, "promise:resolved", {"detail": value}));
     }
   }
@@ -176,10 +176,10 @@
    */
   function reject(value) {
     var promise = this;
-    if (!promise.settled) {
-      setNonEnumerable(promise, "isRejected", true);
-      setNonEnumerable(promise, "settled", true);
-      setNonEnumerable(promise, "rejectedReason", value);
+    if (!promise._settled) {
+      setNonEnumerable(promise, "_rejected", true);
+      setNonEnumerable(promise, "_settled", true);
+      setNonEnumerable(promise, "_rejectedReason", value);
       async(emit.bind(promise, "promise:failed", {"detail": value}));
     }
   }
@@ -193,7 +193,7 @@
    */
   function notify(value) {
     var promise = this;
-    if (!promise.settled) {
+    if (!promise._settled) {
       async(emit.bind(promise, "promise:notified", {"detail": value}));
     }
   }
@@ -208,10 +208,10 @@
    */
   function cancel() {
     var promise = this, value = new CancelException("Cancelled");
-    if (!promise.settled) {
-      setNonEnumerable(promise, "isRejected", true);
-      setNonEnumerable(promise, "settled", true);
-      setNonEnumerable(promise, "rejectedReason", value);
+    if (!promise._settled) {
+      setNonEnumerable(promise, "_rejected", true);
+      setNonEnumerable(promise, "_settled", true);
+      setNonEnumerable(promise, "_rejectedReason", value);
       emit.call(promise, "promise:cancelled", {});
       async(emit.bind(promise, "promise:failed", {"detail": value}));
     }
@@ -299,7 +299,7 @@
   // XXX rename?
   function invokeCallback(type, promise, callback, event) {
     var hasCallback, value, error, succeeded, failed;
-    if (promise.settled) { return; }
+    if (promise._settled) { return; }
     hasCallback = typeof callback === "function";
     if (hasCallback) {
       try {
@@ -375,11 +375,11 @@
     }
   }
 
-  setNonEnumerable(Promise.prototype, "isRejected", false);
-  setNonEnumerable(Promise.prototype, "isFulfilled", false);
-  setNonEnumerable(Promise.prototype, "rejectedReason", null);
-  setNonEnumerable(Promise.prototype, "fulfillmentValue", null);
-  setNonEnumerable(Promise.prototype, "settled", false);
+  setNonEnumerable(Promise.prototype, "_rejected", false);
+  setNonEnumerable(Promise.prototype, "_fulfilled", false);
+  setNonEnumerable(Promise.prototype, "_rejectedReason", null);
+  setNonEnumerable(Promise.prototype, "_fulfillmentValue", null);
+  setNonEnumerable(Promise.prototype, "_settled", false);
 
   // // Used for debugging
   // Promise.prototype.on = on;
@@ -402,18 +402,18 @@
    */
   Promise.prototype.then = function (done, fail, progress) {
     var thenPromise = new this.constructor(function () { return; });
-    if (this.settled) {
-      if (this.isFulfilled) {
+    if (this._settled) {
+      if (this._fulfilled) {
         async(function (promise) {
           invokeCallback("onResolve", thenPromise, done, {
-            "detail": promise.fulfillmentValue
+            "detail": promise._fulfillmentValue
           });
         }, this);
       }
-      if (this.isRejected) {
+      if (this._rejected) {
         async(function (promise) {
           invokeCallback("onReject", thenPromise, fail, {
-            "detail": promise.rejectedReason
+            "detail": promise._rejectedReason
           });
         }, this);
       }
@@ -467,7 +467,7 @@
    * @return {Promise} A new promise
    */
   Promise.prototype.cancel = function () {
-    if (!this.settled) {
+    if (!this._settled) {
       cancel.call(this);
     }
     return this;
@@ -533,7 +533,7 @@
    * @return {Promise} A new fulfilled promise
    */
   Promise.fulfill = function (value) {
-    if (value instanceof Promise && value.isFulfilled) {
+    if (value instanceof Promise && value._fulfilled) {
       return value;
     }
     if (value && typeof value.then === "function") {
@@ -563,7 +563,7 @@
    * @return {Promise} A new rejected promise
    */
   Promise.reject = function (reason) {
-    if (reason instanceof Promise && reason.isRejected) {
+    if (reason instanceof Promise && reason._rejected) {
       return reason;
     }
     if (reason && typeof reason.then === "function") {
