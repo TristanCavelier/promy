@@ -14,6 +14,8 @@
   var toLint = [
     "test-jslint.js",
 
+    "setImmediate.js",
+
     "promy.js",
     "test-promiseaplus.js",
     "test-extended-promise.js",
