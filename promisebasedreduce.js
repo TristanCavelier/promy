@@ -98,7 +98,7 @@
     if (typeof callback !== "function") {
       throw new TypeError("reduce(): argument 2 is not a function");
     }
-    var i = 0, previous = init, cancelled, current_promise;
+    var i = 0, previous = init, cancelled, current_promise, maxlength = array.length;
     if (arguments.length === 2) {
       i = 1;
       previous = array[0];
@@ -121,7 +121,7 @@
           fail(new Error("Cancelled"));
           return;
         }
-        if (i < array.length) {
+        if (i < array.length && i < maxlength) {
           current_promise =
             current_promise.then(callback.bind(null, prev, array[i], i, array));
           current_promise.then(next, fail, notify);

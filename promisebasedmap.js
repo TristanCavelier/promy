@@ -79,14 +79,14 @@
     if (typeof callback !== "function") {
       throw new TypeError("map(): argument 2 is not a function");
     }
-    var cancelled, p1 = resolve(), p2, result = [];
+    var cancelled, p1 = resolve(), p2, result = [], maxlength = array.length;
     return newPromise(function (done, fail, notify) {
       var i = 0;
       function next(value) {
         if (i > 0) {
           result[i - 1] = value;
         }
-        if (i < array.length) {
+        if (i < array.length && i < maxlength) {
           try {
             value = callback.call(thisArg, array[i], i, array);
           } catch (e) {

@@ -83,12 +83,12 @@
     if (typeof callback !== "function") {
       throw new TypeError("forEach(): argument 2 is not a function");
     }
-    var cancelled, p1 = resolve(), p2;
+    var cancelled, p1 = resolve(), p2, maxlength = array.length;
     return newPromise(function (done, fail, notify) {
       var i = 0, value;
       function next() {
         // if cancelled before `next` execution, `next` should not be called
-        if (i < array.length) {
+        if (i < array.length && i < maxlength) {
           try {
             value = callback.call(thisArg, array[i], i, array);
           } catch (e) {
@@ -119,6 +119,54 @@
       }
     });
   }
+
+  // function forEachSynchronousAsPossible(array, callback, thisArg) {
+  //   if (arguments.length === 0) {
+  //     throw new TypeError("forEach(): missing argument 1");
+  //   }
+  //   if (!isArray(array)) {
+  //     throw new TypeError("forEach(): argument 1 is not an array");
+  //   }
+  //   if (arguments.length === 1) {
+  //     throw new TypeError("forEach(): missing argument 2");
+  //   }
+  //   if (typeof callback !== "function") {
+  //     throw new TypeError("forEach(): argument 2 is not a function");
+  //   }
+  //   var cancelled, current_promise = null;
+  //   return newPromise(function (done, fail, notify) {
+  //     var i = 0, value;
+  //     function next() {
+  //       if (cancelled) {
+  //         fail(new Error("Cancelled"));
+  //         return;
+  //       }
+  //       if (i < array.length) {
+  //         try {
+  //           value = callback.call(thisArg, array[i], i, array);
+  //         } catch (e) {
+  //           fail(e);
+  //           return;
+  //         }
+  //         i += 1;
+  //         if (value && typeof value.then === "function") {
+  //           current_promise = value;
+  //           current_promise.then(next, fail, notify);
+  //           return;
+  //         }
+  //         next();
+  //       }
+  //       done();
+  //     }
+  //     next();
+  //   }, function () {
+  //     cancelled = true;
+  //     if (typeof current_promise.cancel === "function") {
+  //       current_promise.cancel();
+  //     }
+  //   });
+  // }
+  // forEach.synchronousAsPossible = forEachSynchronousAsPossible;
 
   /*
    * If the global `promy` exists, then `promy.forEach` is added and if the
