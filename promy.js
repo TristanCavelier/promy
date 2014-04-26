@@ -64,6 +64,17 @@
 
   //////////////////////////////////////////////////////////////////////
 
+  function setNonEnumerable(object, key, value) {
+    Object.defineProperty(object, key, {
+      "configurable": true,
+      "enumerable": false,
+      "writable": true,
+      "value": value
+    });
+  }
+
+  //////////////////////////////////////////////////////////////////////
+
   /**
    *     on.call(promise, type, listener): promise
    *
@@ -149,9 +160,9 @@
   function fulfill(value) {
     var promise = this;
     if (!promise.settled) {
-      promise.isFulfilled = true;
-      promise.settled = true;
-      promise.fulfillmentValue = value;
+      setNonEnumerable(promise, "isFulfilled", true);
+      setNonEnumerable(promise, "settled", true);
+      setNonEnumerable(promise, "fulfillmentValue", value);
       async(emit.bind(promise, "promise:resolved", {"detail": value}));
     }
   }
@@ -166,9 +177,9 @@
   function reject(value) {
     var promise = this;
     if (!promise.settled) {
-      promise.isRejected = true;
-      promise.settled = true;
-      promise.rejectedReason = value;
+      setNonEnumerable(promise, "isRejected", true);
+      setNonEnumerable(promise, "settled", true);
+      setNonEnumerable(promise, "rejectedReason", value);
       async(emit.bind(promise, "promise:failed", {"detail": value}));
     }
   }
@@ -198,9 +209,9 @@
   function cancel() {
     var promise = this, value = new CancelException("Cancelled");
     if (!promise.settled) {
-      promise.isRejected = true;
-      promise.settled = true;
-      promise.rejectedReason = value;
+      setNonEnumerable(promise, "isRejected", true);
+      setNonEnumerable(promise, "settled", true);
+      setNonEnumerable(promise, "rejectedReason", value);
       emit.call(promise, "promise:cancelled", {});
       async(emit.bind(promise, "promise:failed", {"detail": value}));
     }
@@ -364,11 +375,11 @@
     }
   }
 
-  Promise.prototype.isRejected = false;
-  Promise.prototype.isFulfilled = false;
-  Promise.prototype.rejectedReason = null;
-  Promise.prototype.fulfillmentValue = null;
-  Promise.prototype.settled = false;
+  setNonEnumerable(Promise.prototype, "isRejected", false);
+  setNonEnumerable(Promise.prototype, "isFulfilled", false);
+  setNonEnumerable(Promise.prototype, "rejectedReason", null);
+  setNonEnumerable(Promise.prototype, "fulfillmentValue", null);
+  setNonEnumerable(Promise.prototype, "settled", false);
 
   // // Used for debugging
   // Promise.prototype.on = on;
