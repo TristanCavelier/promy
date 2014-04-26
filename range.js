@@ -76,7 +76,7 @@
    * @param  {Promise} A new promise with no fulfillment value.
    */
   function range(start, stop, step, callback) {
-    var type_object, cancelled, current_promise;
+    var type_object, cancelled, p1, p2;
     type_object = arrayToTypeObject([start, stop, step, callback]);
 
     if (type_object["function"].length !== 1) {
@@ -86,56 +86,59 @@
     if (start < 1) {
       throw new TypeError("range(): 1, 2 or 3 numbers are needed");
     }
-    if (start > 3) {
-      throw new TypeError("range(): only 1, 2 or 3 numbers are needed");
-    }
-
     callback = type_object["function"][0];
-
     if (start === 1) {
       start = 0;
       stop = type_object.number[0];
       step = 1;
-    }
-
-    if (start === 2) {
+    } else if (start === 2) {
       start = type_object.number[0];
       stop = type_object.number[1];
       step = 1;
-    }
-
-    if (start === 3) {
+    } else if (start === 3) {
       start = type_object.number[0];
       stop = type_object.number[1];
       step = type_object.number[2];
       if (step === 0) {
         throw new TypeError("range(): step must not be zero");
       }
+    } else {
+      throw new TypeError("range(): only 1, 2 or 3 numbers are needed");
     }
 
     type_object = undefined;
-    current_promise = resolve();
+    p1 = resolve();
     return newPromise(function (done, fail, notify) {
-      var i = start, test;
+      var i = start, test, value;
       function next() {
-        if (cancelled) {
-          fail(new Error("Cancelled"));
-          return;
-        }
         test = step > 0 ? i < stop : i > stop;
         if (test) {
-          current_promise = current_promise.then(callback.bind(null, i));
-          current_promise.then(next, fail, notify);
+          try {
+            value = callback(i);
+          } catch (e) {
+            fail(e);
+            return;
+          }
+          if (cancelled) { return; }
           i += step;
+          if (value && typeof value.then === "function") {
+            p1 = value;
+            p2 = value.then(next, fail, notify);
+          } else {
+            p2 = p2.then(next, fail, notify);
+          }
           return;
         }
         done();
       }
-      next();
+      p2 = p1.then(next);
     }, function () {
       cancelled = true;
-      if (typeof current_promise.cancel === "function") {
-        current_promise.cancel();
+      if (typeof p1.cancel === "function") {
+        p1.cancel();
+      }
+      if (typeof p2.cancel === "function") {
+        p2.cancel();
       }
     });
   }

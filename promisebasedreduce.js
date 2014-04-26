@@ -98,46 +98,118 @@
     if (typeof callback !== "function") {
       throw new TypeError("reduce(): argument 2 is not a function");
     }
-    var i = 0, previous = init, cancelled, current_promise, maxlength = array.length;
+    var i = 0, cancelled, p1, p2, maxlength = array.length;
     if (arguments.length === 2) {
-      i = 1;
-      previous = array[0];
-    }
-    if (array.length === 0) {
-      if (i === 1) {
+      // no init value is provided
+      if (maxlength === 0) {
         return reject(
           new TypeError("Reduce of empty array with no initial value")
         );
       }
+      init = array[0];
+      i = 1;
+    }
+    if (maxlength === i) {
+      // nothing to parse
+      if (init && typeof init.then === "function") {
+        return init;
+      }
       return resolve(init);
     }
-    if (arguments.length < 3 && array.length === 1 && i === 0) {
-      return resolve(array[0]);
-    }
-    current_promise = resolve();
+    p1 = resolve();
     return newPromise(function (done, fail, notify) {
+      var value;
       function next(prev) {
-        if (cancelled) {
-          fail(new Error("Cancelled"));
-          return;
-        }
         if (i < array.length && i < maxlength) {
-          current_promise =
-            current_promise.then(callback.bind(null, prev, array[i], i, array));
-          current_promise.then(next, fail, notify);
+          try {
+            value = callback(prev, array[i], i, array);
+          } catch (e) {
+            fail(e);
+            return;
+          }
+          if (cancelled) { return; }
           i += 1;
+          if (value && typeof value.then === "function") {
+            p1 = value;
+            p2 = value.then(next, fail, notify);
+          } else {
+            p2 = p2.then(next.bind(null, value), fail, notify);
+          }
           return;
         }
         done(prev);
       }
-      next(previous);
+      p2 = p1.then(next.bind(null, init));
     }, function () {
       cancelled = true;
-      if (typeof current_promise.cancel === "function") {
-        current_promise.cancel();
+      if (typeof p1.cancel === "function") {
+        p1.cancel();
+      }
+      if (typeof p2.cancel === "function") {
+        p2.cancel();
       }
     });
   }
+
+  // function reduceSynchronousAsPossible(array, callback, init) {
+  //   if (arguments.length === 0) {
+  //     throw new TypeError("reduce(): missing argument 1");
+  //   }
+  //   if (!isArray(array)) {
+  //     throw new TypeError("reduce(): argument 1 is not an array");
+  //   }
+  //   if (arguments.length === 1) {
+  //     throw new TypeError("reduce(): missing argument 2");
+  //   }
+  //   if (typeof callback !== "function") {
+  //     throw new TypeError("reduce(): argument 2 is not a function");
+  //   }
+  //   var i = 0, cancelled, p, maxlength = array.length;
+  //   if (arguments.length === 2) {
+  //     // no init value is provided
+  //     if (maxlength === 0) {
+  //       return reject(
+  //         new TypeError("Reduce of empty array with no initial value")
+  //       );
+  //     }
+  //     init = array[0];
+  //     i = 1;
+  //   }
+  //   if (maxlength === i) {
+  //     // nothing to parse
+  //     if (init && typeof init.then === "function") {
+  //       return init;
+  //     }
+  //     return resolve(init);
+  //   }
+  //   return newPromise(function (done, fail, notify) {
+  //     var value;
+  //     function next(prev) {
+  //       if (i < array.length && i < maxlength) {
+  //         try {
+  //           value = callback(prev, array[i], i, array);
+  //         } catch (e) {
+  //           fail(e);
+  //           return;
+  //         }
+  //         if (cancelled) { return; }
+  //         i += 1;
+  //         if (value && typeof value.then === "function") {
+  //           p = value.then(next, fail, notify);
+  //           return;
+  //         }
+  //         return next(value);
+  //       }
+  //       done(prev);
+  //     }
+  //     next(init);
+  //   }, function () {
+  //     cancelled = true;
+  //     if (p && typeof p.cancel === "function") {
+  //       p.cancel();
+  //     }
+  //   });
+  // }
 
   /*
    * If the global `promy` exists, then `promy.reduce` is added and if the
