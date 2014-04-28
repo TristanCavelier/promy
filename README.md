@@ -541,7 +541,7 @@ A cancellable and notification propagation Promise A+ tool to iterate a range.
 
 File: `range.js`
 
-Version: v1.1.0 - [License: WTFPLv2](#license)
+Version: v1.1.1 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.range` is added and if the global
 `range` does not exist, it is also provided. Else, if the global `promy` does
