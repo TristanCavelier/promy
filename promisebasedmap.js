@@ -99,7 +99,7 @@
             p1 = value;
             p2 = value.then(next, fail, notify);
           } else {
-            p2 = p2.then(next, fail, notify);
+            p2 = p2.then(next.bind(null, value), fail, notify);
           }
           return;
         }

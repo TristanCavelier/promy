@@ -77,6 +77,18 @@
     }, start);
   });
 
+  tester("check map no thenable", 1, function () {
+    stop();
+    var start = starter(1000);
+
+    map([0, 2, 4, 6], function (index) {
+      return index + 1;
+    }).then(function (result) {
+      deepEqual(result, [1, 3, 5, 7]);
+      start();
+    }, start);
+  });
+
   tester("check map resolved value", 1, function () {
     stop();
     var start = starter(1000);
