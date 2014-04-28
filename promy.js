@@ -297,7 +297,7 @@
 
   // XXX docstring
   // XXX rename?
-  function invokeCallback(code, promise, callback, event) {
+  function invokeCallback(resolver, promise, callback, event) {
     var hasCallback, value, error, succeeded, failed;
     if (promise._settled) { return; }
     hasCallback = typeof callback === "function";
@@ -324,10 +324,8 @@
       resolve.call(promise, value);
     } else if (failed) {
       reject.call(promise, error);
-    } else if (code === 0) { // onResolve
-      resolve.call(promise, value);
-    } else if (code === 1) { // onReject
-      reject.call(promise, value);
+    } else {
+      resolver.call(promise, value);
     }
   }
 
@@ -405,24 +403,24 @@
     if (this._settled) {
       if (this._fulfilled) {
         async(function (promise) {
-          invokeCallback(0, thenPromise, done, { // 0 = onResolve
+          invokeCallback(resolve, thenPromise, done, {
             "detail": promise._fulfillmentValue
           });
         }, this);
       }
       if (this._rejected) {
         async(function (promise) {
-          invokeCallback(1, thenPromise, fail, { // 1 = onReject
+          invokeCallback(reject, thenPromise, fail, {
             "detail": promise._rejectedReason
           });
         }, this);
       }
     } else {
       on.call(this, "promise:resolved", function (event) {
-        invokeCallback(0, thenPromise, done, event); // 0 = onResolve
+        invokeCallback(resolve, thenPromise, done, event);
       });
       on.call(this, "promise:failed", function (event) {
-        invokeCallback(1, thenPromise, fail, event); // 1 = onReject
+        invokeCallback(reject, thenPromise, fail, event);
       });
     }
     on.call(this, "promise:notified", function (event) {
