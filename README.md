@@ -424,7 +424,7 @@ to reduce it to a single value.
 
 File: `promisebasedreduce.js`
 
-Version: v1.1.0 - [License: WTFPLv2](#license)
+Version: v1.1.1 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.reduce` is added and if the global
 `reduce` does not exist, it is also provided. Else, if the global `promy` does
