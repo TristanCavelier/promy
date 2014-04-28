@@ -5,7 +5,7 @@ A Promise A+ compatible library with cancellation and notification
 
 File: `promy.js`
 
-Version: v1.3.1 - [License: WTFPLv2](#license)
+Version: v1.3.2 - [License: WTFPLv2](#license)
 
 Provides the global `promy` with:
 
