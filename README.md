@@ -310,7 +310,7 @@ A cancellable and notification propagation Promise A+ tool to iterate an array.
 
 File: `promisebasedforeach.js`
 
-Version: v1.1.0 - [License: WTFPLv2](#license)
+Version: v1.1.1 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.forEach` is added and if the global
 `forEach` does not exist, it is also provided. Else, if the global `promy` does
