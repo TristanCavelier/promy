@@ -368,7 +368,7 @@ A cancellable and notification propagation Promise A+ tool to map an array.
 
 File: `promisebasedmap.js`
 
-Version: v1.1.0 - [License: WTFPLv2](#license)
+Version: v1.1.1 - [License: WTFPLv2](#license)
 
 If the global `promy` exists, then `promy.map` is added and if the global `map`
 does not exist, it is also provided. Else, if the global `promy` does not exist,
