@@ -332,6 +332,7 @@
   // XXX docstring
   function invokeNotifyCallback(promise, callback, event) {
     var value;
+    if (promise._settled) { return; }
     if (typeof callback === "function") {
       try {
         value = callback(event.detail);
