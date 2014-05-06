@@ -23,35 +23,6 @@
     return startFn;
   }
 
-  module("Promise A+ additions");
-
-  test("Promise.resolve should be a fulfilled promise", function () {
-    stop();
-    var start = starter(1000);
-    Promise.resolve.then(function () {
-      ok(true);
-      start();
-    }, start);
-  });
-
-  test("Promise.fulfill should be a fulfilled promise", function () {
-    stop();
-    var start = starter(1000);
-    Promise.fulfill.then(function () {
-      ok(true);
-      start();
-    }, start);
-  });
-
-  test("Promise.reject should be a rejected promise", function () {
-    stop();
-    var start = starter(1000);
-    Promise.reject.then(start, function () {
-      ok(true);
-      start();
-    });
-  });
-
   module("Promise Notifications");
 
   test("should get notified before resolve", function () {

@@ -28,7 +28,7 @@
    * MIT License: Copyright (c) 2013 Yehuda Katz, Tom Dale, and contributors
    */
 
-  var isArray = Array.isArray, fulfilled_promise, rejected_promise;
+  var isArray = Array.isArray;
 
   //////////////////////////////////////////////////////////////////////
 
@@ -504,8 +504,7 @@
    *     resolve(value): Promise< value >
    *
    * If `value` is not a thenable, it creates a new promise and resolve with
-   * `value`. Else it returns the `value`. `resolve` is also a fulfilled
-   * promise.
+   * `value`. Else it returns the `value`.
    *
    * @param  {Any} value The value to give
    * @return {Promise} A new promise
@@ -518,15 +517,12 @@
       resolve(value);
     }); // no canceller needed, value canceller is used instead
   };
-  fulfilled_promise = Promise.resolve();
-  Promise.resolve.then = fulfilled_promise.then.bind(fulfilled_promise);
 
   /**
    *     fulfill(value): Promise< value >
    *
    * Produces a new resolved promise with `value` as fulfillment value.  If
-   * `value` is a fulfilled promy promise, it just returns `value`. `fulfill` is
-   * also a fulfilled promise.
+   * `value` is a fulfilled promy promise, it just returns `value`.
    *
    * @param  {Any} value The value to give
    * @return {Promise} A new fulfilled promise
@@ -548,15 +544,13 @@
       resolve(value);
     });
   };
-  Promise.fulfill.then = Promise.resolve.then;
 
   /**
    *     reject(reason): Promise< reason >
    *
    * Produces a new resolved promise with `value` as fulfillment value.  For
    * consistency and debugging, the reason should be an instance of `Error`. If
-   * `value` is a rejected promy promise, it just returns `value`. `reject` is
-   * also a rejected promise.
+   * `value` is a rejected promy promise, it just returns `value`.
    *
    * @param  {Any} reason The reason to give
    * @return {Promise} A new rejected promise
@@ -579,8 +573,6 @@
       /*jslint unparam: true */
     });
   };
-  rejected_promise = Promise.reject();
-  Promise.reject.then = rejected_promise.then.bind(rejected_promise);
 
   /**
    *     notify(notification[, answer]): Promise< answer >

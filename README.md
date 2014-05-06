@@ -125,8 +125,7 @@ If `value` is not a promy promise, it creates a new promise and resolve with
     Promise.resolve(value): Promise< value >
 
 If `value` is not a thenable, it creates a new promise and resolve with
-`value`. Else it returns the `value`. `Promise.resolve` is also a fulfilled
-promise.
+`value`. Else it returns the `value`.
 
 
 ### Promise.reject()
@@ -138,8 +137,7 @@ promise.
 
 Produces a new resolved promise with `value` as fulfillment value.  For
 consistency and debugging, the reason should be an instance of `Error`. If
-`value` is a rejected promy promise, it just returns `value`. `reject` is
-also a rejected promise.
+`value` is a rejected promy promise, it just returns `value`.
 
 
 ### Promise.fulfill()
@@ -150,8 +148,7 @@ also a rejected promise.
     fulfilled(value): Promise< value >
 
 Produces a new resolved promise with `value` as fulfillment value.  If `value`
-is a fulfilled promy promise, it just returns `value`. `Promise.fulfill` is also
-a fulfilled promise.
+is a fulfilled promy promise, it just returns `value`.
 
 
 ### Promise.notify()
