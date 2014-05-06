@@ -10,7 +10,7 @@
    * complete sequence of `then` promises since the creation of the cancellable
    * chain.
    *
-   * Version: v1.1.0
+   * Version: v1.1.1
    *
    * Copyright (c) 2014 Tristan Cavelier <t.cavelier@free.fr>
    * This program is free software. It comes without any warranty, to
