@@ -158,13 +158,11 @@
    * @param  {Any} value The fulfillment value
    */
   function fulfill(value) {
-    var promise = this;
-    if (!promise._settled) {
-      setNonEnumerable(promise, "_fulfilled", true);
-      setNonEnumerable(promise, "_settled", true);
-      setNonEnumerable(promise, "_fulfillmentValue", value);
-      async(emit.bind(promise, "promise:resolved", {"detail": value}));
-    }
+    if (this._settled) { return; }
+    setNonEnumerable(this, "_fulfilled", true);
+    setNonEnumerable(this, "_settled", true);
+    setNonEnumerable(this, "_fulfillmentValue", value);
+    async(emit.bind(this, "promise:resolved", {"detail": value}));
   }
 
   /**
@@ -175,13 +173,11 @@
    * @param  {Any} value The rejection value
    */
   function reject(value) {
-    var promise = this;
-    if (!promise._settled) {
-      setNonEnumerable(promise, "_rejected", true);
-      setNonEnumerable(promise, "_settled", true);
-      setNonEnumerable(promise, "_rejectedReason", value);
-      async(emit.bind(promise, "promise:failed", {"detail": value}));
-    }
+    if (this._settled) { return; }
+    setNonEnumerable(this, "_rejected", true);
+    setNonEnumerable(this, "_settled", true);
+    setNonEnumerable(this, "_rejectedReason", value);
+    async(emit.bind(this, "promise:failed", {"detail": value}));
   }
 
   /**
@@ -192,10 +188,8 @@
    * @param  {Any} value The rejected value
    */
   function notify(value) {
-    var promise = this;
-    if (!promise._settled) {
-      async(emit.bind(promise, "promise:notified", {"detail": value}));
-    }
+    if (this._settled) { return; }
+    async(emit.bind(this, "promise:notified", {"detail": value}));
   }
 
   /**
@@ -207,14 +201,13 @@
    * @param  {Any} value The rejection value
    */
   function cancel() {
-    var promise = this, value = new CancelException("Cancelled");
-    if (!promise._settled) {
-      setNonEnumerable(promise, "_rejected", true);
-      setNonEnumerable(promise, "_settled", true);
-      setNonEnumerable(promise, "_rejectedReason", value);
-      emit.call(promise, "promise:cancelled", {});
-      async(emit.bind(promise, "promise:failed", {"detail": value}));
-    }
+    var value = new CancelException("Cancelled");
+    if (this._settled) { return; }
+    setNonEnumerable(this, "_rejected", true);
+    setNonEnumerable(this, "_settled", true);
+    setNonEnumerable(this, "_rejectedReason", value);
+    emit.call(this, "promise:cancelled", {});
+    async(emit.bind(this, "promise:failed", {"detail": value}));
   }
 
   /**
