@@ -94,7 +94,9 @@
     if (!(this instanceof CancellableChain)) {
       return new CancellableChain(value);
     }
-    this._value = value;
+    if (arguments.length > 0) {
+      this._value = value;
+    }
   }
 
   /**
@@ -107,26 +109,24 @@
    * @param  {Function} done The callback to call on fulfill
    * @param  {Function} fail The callback to call on reject
    * @param  {Function} progress The callback to call on progress
-   * @return {CancellableChain} Itself
+   * @return {CancellableChain} A new cancellable chain
    */
   CancellableChain.prototype.then = function (done, fail, progress) {
-    if (!this._promises) {
-      this._promises = [resolve(this._value)];
+    if (!this._current) {
+      this._current = resolve(this._value);
       delete this._value;
     }
 
-    var promises, l, cc = new CancellableChain();
-    cc._promises = this._promises.slice();
-    promises = cc._promises;
-    l = promises.length;
-    promises[l] = promises[l - 1].then(function (answer) {
-      promises.shift();
+    var cc = new CancellableChain();
+    cc._parent = this;
+    cc._current = this._current.then(function (answer) {
+      delete cc._parent;
       if (typeof done === "function") {
         return done(answer);
       }
       return answer;
     }, function (reason) {
-      promises.shift();
+      delete cc._parent;
       if (typeof fail === "function") {
         return fail(reason);
       }
@@ -142,7 +142,7 @@
    *
    * @method catch
    * @param  {Function} fail The callback to call on reject
-   * @return {CancellableChain} Itself
+   * @return {CancellableChain} A new cancellable chain
    */
   CancellableChain.prototype.catch = function (fail) {
     return this.then(null, fail);
@@ -155,7 +155,7 @@
    *
    * @method progress
    * @param  {Function} progress The callback to call on notify
-   * @return {CancellableChain} Itself
+   * @return {CancellableChain} A new cancellable chain
    */
   CancellableChain.prototype.progress = function (progress) {
     return this.then(null, null, progress);
@@ -171,16 +171,17 @@
    * @return {CancellableChain} Itself
    */
   CancellableChain.prototype.cancel = function () {
-    if (!this._promises) {
-      this._promises = [resolve(this._value)];
+    if (!this._current) {
+      this._current = resolve(this._value);
       delete this._value;
     }
 
-    var i, promises = this._promises, l = promises.length;
-    for (i = 0; i < l; i += 1) {
-      if (typeof promises[i].cancel === "function") {
-        promises[i].cancel();
-      }
+    if (this._parent && typeof this._parent.cancel === "function") {
+      this._parent.cancel();
+      delete this._parent;
+    }
+    if (typeof this._current.cancel === "function") {
+      this._current.cancel();
     }
     return this;
   };
@@ -194,15 +195,17 @@
    * @return {Promise} A new promise
    */
   CancellableChain.prototype.detach = function () {
-    if (!this._promises) {
-      this._promises = [resolve(this._value)];
+    if (!this._current) {
+      this._current = resolve(this._value);
       delete this._value;
     }
 
-    var promises = this._promises;
+    var dis = this;
     return newPromise(function (resolve, reject, notify) {
-      promises[promises.length - 1].then(resolve, reject, notify);
-    }, this.cancel.bind(this));
+      dis._current.then(resolve, reject, notify);
+    }, function () {
+      dis.cancel();
+    });
   };
 
   /*
